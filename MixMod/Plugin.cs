@@ -1,6 +1,8 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
+using Blizzard.T5.Core.Time;
 using HarmonyLib;
+using Hearthstone.Commerce;
 using MixMod.Patches;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +18,51 @@ namespace MixMod
         {
             MixModConfig.Load(Config);
             MixModConfig.Get().timeScaleEnabledEntry.SettingChanged += (_, _) => TimeScaleMgr.Get().Update();
+            MixModConfig.Get().devicePresetEntry.SettingChanged += (_, _) =>
+            {
+                if (MixModConfig.Get().DevicePreset == DevicePreset.Custom)
+                {
+                    if (MixModConfig.Get().osEntry is null)
+                    {
+                        MixModConfig.Get().osEntry = Config.Bind("Gifts", "OS", PlatformSettings.OS, "Тип операционной системы для эмуляции другого устройства");
+                    }
+                    if (MixModConfig.Get().screenEntry is null)
+                    {
+                        MixModConfig.Get().screenEntry = Config.Bind("Gifts", "Screen", PlatformSettings.Screen, "Экран для эмуляции");
+                    }
+                    if (MixModConfig.Get().deviceNameEntry is null)
+                    {
+                        MixModConfig.Get().deviceNameEntry = Config.Bind("Gifts", "DeviceName", PlatformSettings.DeviceName, "Имя устройства для эмуляции");
+                    }
+                    //if (MixModConfig.Get().operatingSystemEntry is null)
+                    //{
+                    //    MixModConfig.Get().operatingSystemEntry = Config.Bind("Gifts", "OperatingSystem", SystemInfo.operatingSystem, new ConfigDescription("Версия операционной системы для эмуляции", new AcceptableValueList<string>("Android OS 10 / API-29 (QP1A.190711.020.T860XXU1BTD1)", "Android OS 11 / API-30 (RP1A.200720.012/N986BXXS1DUC1)", "Android OS 10 / API-29 (HUAWEIELS-N29/10.1.0.176C432)", "iOS 14.6")));
+                    //}
+                }
+                else
+                {
+                    if (MixModConfig.Get().osEntry is not null)
+                    {
+                        Config.Remove(MixModConfig.Get().osEntry.Definition);
+                        MixModConfig.Get().osEntry = null;
+                    }
+                    if (MixModConfig.Get().screenEntry is not null)
+                    {
+                        Config.Remove(MixModConfig.Get().screenEntry.Definition);
+                        MixModConfig.Get().screenEntry = null;
+                    }
+                    if (MixModConfig.Get().deviceNameEntry is not null)
+                    {
+                        Config.Remove(MixModConfig.Get().deviceNameEntry.Definition);
+                        MixModConfig.Get().deviceNameEntry = null;
+                    }
+                    //if (MixModConfig.Get().operatingSystemEntry is not null)
+                    //{
+                    //    Config.Remove(MixModConfig.Get().operatingSystemEntry.Definition);
+                    //    MixModConfig.Get().operatingSystemEntry = null;
+                    //}
+                }
+            };
             MixModConfig.Get().timeScaleEntry.SettingChanged += (_, _) => TimeScaleMgr.Get().Update();
             var harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
             TimeScaleMgr.Get().Update();
@@ -28,6 +75,13 @@ namespace MixMod
             {
                 return;
             }
+            //if (MixModConfig.Get().PackIdToBuy != 0 && MixModConfig.Get().BuyPackShortcut.IsDown() && StoreManager.Get() != null && Shop.Get() != null)
+            //{
+            //    var productByPmtId = StoreManager.Get().Catalog.GetProductByPmtId(ProductId.CreateFromValidated(MixModConfig.Get().PackIdToBuy));
+            //    var priceDataModel = productByPmtId.Prices.FirstOrDefault(p => p.Currency == CurrencyType.GOLD);
+            //    Shop.Get().AttemptToPurchaseProduct(productByPmtId, priceDataModel);
+            //    return;
+            //}
             if (SoundManager.Get() != null && MixModConfig.Get().SoundMuteShortcut.IsDown())
             {
                 SoundManagerPatch.OnMuteKeyPressed();
@@ -117,14 +171,11 @@ namespace MixMod
                         BnetPlayer currentOpponent = null;
                         if (GameMgr.Get().IsBattlegrounds())
                         {
-                            if (PlayerLeaderboardManager.Get() != null)
-                            {
-                                currentOpponent = PlayerLeaderboardManager.Get().GetCurrentOpponent();
-                            }
+                            currentOpponent = PlayerLeaderboardManagerPatch.GetCurrentOpponent();
                         }
-                        else if (FriendMgr.Get() != null)
+                        else
                         {
-                            currentOpponent = FriendMgr.Get().GetCurrentOpponent();
+                            currentOpponent = GameplayPatch.GetCurrentOpponent();
                         }
                         if (currentOpponent != null)
                         {

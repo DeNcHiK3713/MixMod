@@ -30,7 +30,7 @@ namespace MixMod.Patches
             m_currentOpponent = BnetPresenceMgr.Get().GetPlayer(id);
         }
 
-        public static BnetPlayer GetCurrentOpponent(this PlayerLeaderboardManager __instance)
+        public static BnetPlayer GetCurrentOpponent()
         {
             return m_currentOpponent;
         }

@@ -34,13 +34,13 @@ namespace MixMod
         internal ConfigEntry<CardState> goldenEntry;
         internal ConfigEntry<CardState> diamondEntry;
         internal ConfigEntry<bool> showOpponentRankInGameEntry;
-        internal ConfigEntry<bool> quickPackOpeningEnabledEntry;
         internal ConfigEntry<bool> moveEnemyCardsEntry;
+        internal ConfigEntry<int> packIdToBuyEntry;
         internal ConfigEntry<bool> firesideGatheringEntry;
         internal ConfigEntry<double> latitudeEntry;
         internal ConfigEntry<double> longitudeEntry;
         internal ConfigEntry<double> gpsAccuracyEntry;
-        internal ConfigEntry<bool> isDeviceInfoModifiedEntry;
+        internal ConfigEntry<DevicePreset> devicePresetEntry;
         internal ConfigEntry<OSCategory> osEntry;
         internal ConfigEntry<ScreenCategory> screenEntry;
         internal ConfigEntry<string> deviceNameEntry;
@@ -65,9 +65,11 @@ namespace MixMod
         internal ConfigEntry<KeyboardShortcut> copyBattleTagShortcutEntry;
         internal ConfigEntry<KeyboardShortcut> copySelectedBattleTagShortcutEntry;
         internal ConfigEntry<KeyboardShortcut> simulateDisconnectShortcutEntry;
+        internal ConfigEntry<KeyboardShortcut> buyPackShortcutEntry;
 
         public MixModConfig(ConfigFile config)
         {
+            _config = config;
 #if DEBUG
             devEnabledEntry = config.Bind("Dev", "DevEnabled", false, "Режим разработчика мода");
             isInternalEntry = config.Bind("Dev", "IsInternal", false, "Режим разработчика игры");
@@ -109,16 +111,13 @@ namespace MixMod
             goldenEntry = config.Bind("Gameplay", "GOLDEN", CardState.Default, "Изменения для золотых карт");
             diamondEntry = config.Bind("Gameplay", "DIAMOND", CardState.Default, "Изменения для бриллиантовых карт");
             showOpponentRankInGameEntry = config.Bind("Gameplay", "ShowOpponentRankInGame", false, "Включить отображение ранга текущего противника");
-            quickPackOpeningEnabledEntry = config.Bind("Others", "QuickPackOpeningEnabled", false, "Включить быстрое открытие пака, по нажатию клавиши пробела");
             moveEnemyCardsEntry = config.Bind("Others", "MoveEnemyCards", false, "Развернуть карты в руке оппонента в режиме зрителя");
+            //packIdToBuyEntry = config.Bind("Others", "PackIdToBuy", 0, "ID пака для покупки");
             firesideGatheringEntry = config.Bind("Gifts", "FiresideGathering", false, "Включить эмулюцию GPS для Fireside Gathering");
             latitudeEntry = config.Bind("Gifts", "Latitude", 0d, "Широта");
             longitudeEntry = config.Bind("Gifts", "Longitude", 0d, "Долгота");
             gpsAccuracyEntry = config.Bind("Gifts", "GpsAccuracy", 54d, "Точность определения местоположения");
-            //osEntry = config.Bind("Gifts", "OS", PlatformSettings.OS, "Тип операционной системы для эмуляции другого устройства");
-            //screenEntry = config.Bind("Gifts", "Screen", PlatformSettings.Screen, "Экран для эмуляции");
-            //deviceNameEntry = config.Bind("Gifts", "DeviceName", PlatformSettings.DeviceName, new ConfigDescription("Имя устройства для эмуляции", new AcceptableValueList<string>("samsung SM-T860", "samsung SM-N986B", "HUAWEI ELS-NX9", "iPad13,11", "iPhone13,4")));
-            //operatingSystemEntry = config.Bind("Gifts", "OperatingSystem", SystemInfo.operatingSystem, new ConfigDescription("Версия операционной системы для эмуляции", new AcceptableValueList<string>("Android OS 10 / API-29 (QP1A.190711.020.T860XXU1BTD1)", "Android OS 11 / API-30 (RP1A.200720.012/N986BXXS1DUC1)", "Android OS 10 / API-29 (HUAWEIELS-N29/10.1.0.176C432)", "iOS 14.6")));
+            devicePresetEntry = config.Bind("Gifts", "DevicePreset", DevicePreset.Default, "Имитация устройств");
 #if DEBUG
             testShortcutEntry = config.Bind("Shortcuts", "TestShortcut", new KeyboardShortcut(KeyCode.U, KeyCode.LeftControl), "Клавиша для тестов");
 #else
@@ -149,6 +148,7 @@ namespace MixMod
             copyBattleTagShortcutEntry = config.Bind("Shortcuts", "CopyBattleTag", new KeyboardShortcut(KeyCode.C, KeyCode.LeftControl));
             copySelectedBattleTagShortcutEntry = config.Bind("Shortcuts", "CopySelectedBattleTag", new KeyboardShortcut(KeyCode.Mouse0));
             simulateDisconnectShortcutEntry = config.Bind("Shortcuts", "SimulateDisconnect", new KeyboardShortcut(KeyCode.D, KeyCode.LeftControl));
+            //buyPackShortcutEntry = config.Bind("Shortcuts", "BuyPack", new KeyboardShortcut(KeyCode.B, KeyCode.LeftControl));
         }
 
         public static void Load(ConfigFile config)
@@ -223,13 +223,13 @@ namespace MixMod
         public CardState GOLDEN { get => goldenEntry.Value; set => goldenEntry.Value = value; }
         public CardState DIAMOND { get => diamondEntry.Value; set => diamondEntry.Value = value; }
         public bool ShowOpponentRankInGame { get => showOpponentRankInGameEntry.Value; set => showOpponentRankInGameEntry.Value = value; }
-        public bool QuickPackOpeningEnabled { get => quickPackOpeningEnabledEntry.Value; set => quickPackOpeningEnabledEntry.Value = value; }
         public bool MoveEnemyCards { get => moveEnemyCardsEntry.Value; set => moveEnemyCardsEntry.Value = value; }
+        public int PackIdToBuy { get => packIdToBuyEntry.Value; set => packIdToBuyEntry.Value = value; }
         public bool FiresideGathering { get => firesideGatheringEntry.Value; set => firesideGatheringEntry.Value = value; }
         public double Latitude { get => latitudeEntry.Value; set => latitudeEntry.Value = value; }
         public double Longitude { get => longitudeEntry.Value; set => longitudeEntry.Value = value; }
         public double GpsAccuracy { get => gpsAccuracyEntry.Value; set => gpsAccuracyEntry.Value = value; }
-        public bool IsDeviceInfoModified { get => isDeviceInfoModifiedEntry.Value; set => isDeviceInfoModifiedEntry.Value = value; }
+        public DevicePreset DevicePreset { get => devicePresetEntry.Value; set => devicePresetEntry.Value = value; }
         public OSCategory Os { get => osEntry.Value; set => osEntry.Value = value; }
         public ScreenCategory Screen { get => screenEntry.Value; set => screenEntry.Value = value; }
         public string DeviceName { get => deviceNameEntry.Value; set => deviceNameEntry.Value = value; }
@@ -267,5 +267,6 @@ namespace MixMod
         public KeyboardShortcut CopyBattleTagShortcut { get => copyBattleTagShortcutEntry.Value; set => copyBattleTagShortcutEntry.Value = value; }
         public KeyboardShortcut CopySelectedBattleTagShortcut { get => copySelectedBattleTagShortcutEntry.Value; set => copySelectedBattleTagShortcutEntry.Value = value; }
         public KeyboardShortcut SimulateDisconnectShortcut { get => simulateDisconnectShortcutEntry.Value; set => simulateDisconnectShortcutEntry.Value = value; }
+        public KeyboardShortcut BuyPackShortcut { get => buyPackShortcutEntry.Value; set => buyPackShortcutEntry.Value = value; }
     }
 }
