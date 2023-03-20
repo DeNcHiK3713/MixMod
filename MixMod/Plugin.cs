@@ -64,6 +64,7 @@ namespace MixMod
                 }
             };
             MixModConfig.Get().timeScaleEntry.SettingChanged += (_, _) => TimeScaleMgr.Get().Update();
+            MixModConfig.Get().timeScaleInGameOnlyEntry.SettingChanged += (_, _) => TimeScaleMgr.Get().Update();
             var harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
             TimeScaleMgr.Get().Update();
             Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded! (Patched {harmony.GetPatchedMethods().Count()} methods)");

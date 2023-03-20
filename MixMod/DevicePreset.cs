@@ -16,6 +16,8 @@ namespace MixMod
         Tablet,
         [Description("Настройки для телефона Huawei")]
         HuaweiPhone,
+        [Description("Настройки для компьютера Mac")]
+        Mac,
         [Description("Свои настройки")]
         Custom
     }

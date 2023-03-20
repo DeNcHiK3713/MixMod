@@ -22,6 +22,7 @@ namespace MixMod
         internal ConfigEntry<CardState> goldenCoinEntry;
         internal ConfigEntry<bool> enableShortcutsEntry;
         internal ConfigEntry<bool> timeScaleEnabledEntry;
+        internal ConfigEntry<bool> timeScaleInGameOnlyEntry;
         internal ConfigEntry<float> timeScaleEntry;
         internal ConfigEntry<bool> skipHeroIntroEntry;
         internal ConfigEntry<bool> shutUpBobEntry;
@@ -33,6 +34,7 @@ namespace MixMod
         internal ConfigEntry<bool> disableThinkEmotesEntry;
         internal ConfigEntry<CardState> goldenEntry;
         internal ConfigEntry<CardState> diamondEntry;
+        internal ConfigEntry<CardState> signatureEntry;
         internal ConfigEntry<bool> showOpponentRankInGameEntry;
         internal ConfigEntry<bool> moveEnemyCardsEntry;
         internal ConfigEntry<int> packIdToBuyEntry;
@@ -99,6 +101,7 @@ namespace MixMod
 #endif
             enableShortcutsEntry = config.Bind("Global", "EnableShortcuts", false, "Включить горячие клавиши");
             timeScaleEnabledEntry = config.Bind("Global", "TimeScaleEnabled", false, "Включить ускорение анимации");
+            timeScaleInGameOnlyEntry = config.Bind("Global", "TimeScaleInGameOnly", false, "Ускорение анимации только в игре");
             timeScaleEntry = config.Bind("Global", "TimeScale", 1f, new ConfigDescription("Значение для ускорения анимации", new AcceptableValueRange<float>(1f, 8f)));
             skipHeroIntroEntry = config.Bind("Gameplay", "SkipHeroIntro", false, "Отключить анимацию представления героев");
             shutUpBobEntry = config.Bind("Gameplay", "ShutUpBob", false, "Отключить комментарии Боба на полях сражений");
@@ -110,6 +113,7 @@ namespace MixMod
             disableThinkEmotesEntry = config.Bind("Gameplay", "DisableThinkEmotes", false, "Отключить эмоции раздумья героев");
             goldenEntry = config.Bind("Gameplay", "GOLDEN", CardState.Default, "Изменения для золотых карт");
             diamondEntry = config.Bind("Gameplay", "DIAMOND", CardState.Default, "Изменения для бриллиантовых карт");
+            signatureEntry = config.Bind("Gameplay", "SIGNATURE", CardState.Default, "Изменения для сигнатурных карт");
             showOpponentRankInGameEntry = config.Bind("Gameplay", "ShowOpponentRankInGame", false, "Включить отображение ранга текущего противника");
             moveEnemyCardsEntry = config.Bind("Others", "MoveEnemyCards", false, "Развернуть карты в руке оппонента в режиме зрителя");
             //packIdToBuyEntry = config.Bind("Others", "PackIdToBuy", 0, "ID пака для покупки");
@@ -211,6 +215,7 @@ namespace MixMod
         }
         public bool EnableShortcuts { get => enableShortcutsEntry.Value; set => enableShortcutsEntry.Value = value; }
         public bool TimeScaleEnabled { get => timeScaleEnabledEntry.Value; set => timeScaleEnabledEntry.Value = value; }
+        public bool TimeScaleInGameOnly { get => timeScaleInGameOnlyEntry.Value; set => timeScaleInGameOnlyEntry.Value = value; }
         public float TimeScale { get => timeScaleEntry.Value; set => timeScaleEntry.Value = value; }
         public bool SkipHeroIntro { get => skipHeroIntroEntry.Value; set => skipHeroIntroEntry.Value = value; }
         public bool ShutUpBob { get => shutUpBobEntry.Value; set => shutUpBobEntry.Value = value; }
@@ -222,6 +227,7 @@ namespace MixMod
         public bool DisableThinkEmotes { get => disableThinkEmotesEntry.Value; set => disableThinkEmotesEntry.Value = value; }
         public CardState GOLDEN { get => goldenEntry.Value; set => goldenEntry.Value = value; }
         public CardState DIAMOND { get => diamondEntry.Value; set => diamondEntry.Value = value; }
+        public CardState SIGNATURE { get => signatureEntry.Value; set => signatureEntry.Value = value; }
         public bool ShowOpponentRankInGame { get => showOpponentRankInGameEntry.Value; set => showOpponentRankInGameEntry.Value = value; }
         public bool MoveEnemyCards { get => moveEnemyCardsEntry.Value; set => moveEnemyCardsEntry.Value = value; }
         public int PackIdToBuy { get => packIdToBuyEntry.Value; set => packIdToBuyEntry.Value = value; }

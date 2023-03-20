@@ -12,7 +12,6 @@ namespace MixMod.Patches
             yield return typeof(Card).GetMethod("GetPremium", BindingFlags.Instance | BindingFlags.Public);
             yield return typeof(CollectionDraggableCardVisual).GetMethod("GetPremium", BindingFlags.Instance | BindingFlags.Public);
             yield return typeof(HeroPickerButton).GetMethod("GetPremium", BindingFlags.Instance | BindingFlags.Public);
-            yield return typeof(RewardExtensions).GetMethod("GetPremium", BindingFlags.Static | BindingFlags.Public);
             yield return typeof(SpawnToDeckSpell).GetMethod("GetPremium", BindingFlags.Instance | BindingFlags.NonPublic);
         }
         

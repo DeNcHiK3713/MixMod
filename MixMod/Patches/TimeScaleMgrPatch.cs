@@ -20,10 +20,11 @@ namespace MixMod.Patches
     {
         public static bool Prefix(float ___m_timeScaleMultiplier, float ___m_gameTimeScale)
         {
-            if (!MixModConfig.Get().TimeScaleEnabled)
+            if (!MixModConfig.Get().TimeScaleEnabled || (MixModConfig.Get().TimeScaleInGameOnly && !GameMgrPatch.GameStarted))
             {
                 return true;
             }
+
             float timeScale = MixModConfig.Get().TimeScale;
             Time.timeScale = timeScale > ___m_timeScaleMultiplier
                 ? (timeScale + (___m_timeScaleMultiplier - 1f) * 0.5f) * ___m_gameTimeScale

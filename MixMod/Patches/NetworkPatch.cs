@@ -45,6 +45,11 @@ namespace MixMod.Patches
                     screen = ScreenCategory.Phone;
                     deviceName = "Huawei Nova 8";
                     break;
+                case DevicePreset.Mac:
+                    os = OSCategory.Mac;
+                    screen = ScreenCategory.PC;
+                    deviceName = "MacBookPro11,3";
+                    break;
                 case DevicePreset.Custom:
                     os = MixModConfig.Get().Os;
                     screen = MixModConfig.Get().Screen;
@@ -62,7 +67,7 @@ namespace MixMod.Patches
 
         private static string GetMD5(string message)
         {
-            byte[] hash = new MD5CryptoServiceProvider().ComputeHash(Encoding.Default.GetBytes(message));
+            byte[] hash = MD5.Create().ComputeHash(Encoding.Default.GetBytes(message));
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < hash.Length; i++)
             {

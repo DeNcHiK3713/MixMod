@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using Blizzard.T5.Core.Time;
+using HarmonyLib;
 
 namespace MixMod.Patches
 {
@@ -14,6 +15,38 @@ namespace MixMod.Patches
                 return false;
             }
             return true;
+        }
+    }
+
+    public static class GameMgrPatch
+    {
+        public static bool GameStarted { get; set; }
+    }
+
+    [HarmonyPatch(typeof(GameMgr), "OnGameSetup")]
+    public static class GameMgr_OnGameSetup
+    {
+        public static void Postfix()
+        {
+            GameMgrPatch.GameStarted = true;
+            if (MixModConfig.Get().TimeScaleInGameOnly)
+            {
+                TimeScaleMgr.Get().Update();
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(GameMgr), "OnGameCanceled")]
+    [HarmonyPatch(typeof(GameMgr), "OnGameEnded")]
+    public static class GameMgr_OnGameEnded
+    {
+        public static void Postfix()
+        {
+            GameMgrPatch.GameStarted = false;
+            if (MixModConfig.Get().TimeScaleInGameOnly)
+            {
+                TimeScaleMgr.Get().Update();
+            }
         }
     }
 }
