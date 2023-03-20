@@ -1,0 +1,107 @@
+name: MixMod workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Get next version
+        uses: reecetech/version-increment@2023.3.1
+        id: version
+        with:
+          scheme: semver
+          increment: patch
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
+      - name: Install dependencies
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: libimage-exiftool-perl
+          version: 1.0
+      - name: Download files
+        run: |
+          repo_dir=$(pwd)
+          mkdir ../downloads/
+          cd ../downloads/
+          wget https://github.com/DeNcHiK3713/CASCExplorer/releases/download/$(jq -r 'map(select(.prerelease)) | first | .tag_name' <<< $(curl --silent https://api.github.com/repos/DeNcHiK3713/CASCExplorer/releases))/CASCConsole.net6.0.linux-x64.zip -O CASCConsole.zip
+          unzip CASCConsole.zip -d CASCConsole
+          chmod +x ./CASCConsole/CASCConsole
+          ./CASCConsole/CASCConsole -m Pattern -e Hearthstone_Data/Managed/Assembly-CSharp.dll -o -p hsb -l None -d ./
+          ./CASCConsole/CASCConsole -m Pattern -e Hearthstone_Data/Managed/Assembly-CSharp-firstpass.dll -o -p hsb -l None -d ./
+          ./CASCConsole/CASCConsole -m Pattern -e Hearthstone_Data/Managed/blizzard.bgsclient.dll -o -p hsb -l None -d ./
+          ./CASCConsole/CASCConsole -m Pattern -e Hearthstone_Data/Managed/Blizzard.T5.Configuration.dll -o -p hsb -l None -d ./
+          ./CASCConsole/CASCConsole -m Pattern -e Hearthstone_Data/Managed/Blizzard.T5.Core.dll -o -p hsb -l None -d ./
+          ./CASCConsole/CASCConsole -m Pattern -e Hearthstone.exe -o -p hsb -l None -d ./
+          UnityVersion=$(exiftool -UnityVersion -b Hearthstone.exe)
+          echo "unity_version=${UnityVersion%%f1*}" >> $GITHUB_ENV
+          cd $repo_dir
+      - name: Edit csproj file
+        run: |
+          sed -i "s/<Version>.*<\/Version>/<Version>${{ steps.version.outputs.version }}<\/Version>/" ./MixMod/MixMod.csproj
+          sed -i "s/<PackageReference Include=\"UnityEngine.Modules\" Version=\".*\" IncludeAssets=\"compile\" \/>/<PackageReference Include=\"UnityEngine.Modules\" Version=\"${{ env.unity_version }}\" IncludeAssets=\"compile\" \/>/" ./MixMod/MixMod.csproj
+      - name: Commit changes
+        id: git_auto_commit
+        uses: stefanzweifel/git-auto-commit-action@v4
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore -c Release
+      - name: Make packages
+        run: |
+          repo_dir=$(pwd)
+          mkdir ../Release/
+          cd ../Release/
+          BepInExRelease=$(curl --silent https://api.github.com/repos/BepInEx/BepInEx/releases/latest)
+          wget $(jq -r '.assets[] | select(.name | startswith("BepInEx_x86")) | .browser_download_url' <<< ${BepInExRelease}) -O BepInEx_x86.zip
+          unzip BepInEx_x86.zip -x changelog.txt -d MixMod_Windows
+          wget $(jq -r '.assets[] | select(.name | startswith("BepInEx_unix")) | .browser_download_url' <<< ${BepInExRelease}) -O BepInEx_unix.zip
+          unzip BepInEx_unix.zip -x changelog.txt -d MixMod_Mac
+          wget "https://unity.bepinex.dev/corlibs/${{ env.unity_version }}.zip" -O corlibs.zip
+          unzip corlibs.zip -d MixMod_Windows/BepInEx/unstripped_corlib/
+          unzip corlibs.zip -d MixMod_Mac/BepInEx/unstripped_corlib/
+          wget "https://unity.bepinex.dev/libraries/${{ env.unity_version }}.zip" -O libraries.zip
+          unzip libraries.zip -d MixMod_Windows/BepInEx/unstripped_corlib/
+          unzip libraries.zip -d MixMod_Mac/BepInEx/unstripped_corlib/
+          sed -i "s/dllSearchPathOverride=/dllSearchPathOverride=BepInEx\\\unstripped_corlib/" ./MixMod_Windows/doorstop_config.ini
+          sed -i "s/DOORSTOP_CORLIB_OVERRIDE_PATH=\"\"/DOORSTOP_CORLIB_OVERRIDE_PATH=\"\$BASEDIR\/BepInEx\/unstripped_corlib\"/" ./MixMod_Mac/run_bepinex.sh
+          sed -i "s/executable_name=\"\"/executable_name=\"Hearthstone.app\"/" ./MixMod_Mac/run_bepinex.sh
+          sudo tee -a ./MixMod_Mac/client.config <<EOF
+          [Config]
+          Version = 3
+          [Aurora]
+          VerifyWebCredentials = "token"
+          ClientCheck = 0
+          Env.Override = 1
+          Env = eu.actual.battle.net
+          EOF
+          mkdir ./MixMod_Windows/BepInEx/plugins/
+          cp ${repo_dir}/MixMod/bin/Release/net46/MixMod.dll ./MixMod_Windows/BepInEx/plugins/
+          mkdir ./MixMod_Mac/BepInEx/plugins/
+          cp ${repo_dir}/MixMod/bin/Release/net46/MixMod.dll ./MixMod_Mac/BepInEx/plugins/
+          wget $(jq -r '.assets | first | .browser_download_url' <<< $(curl --silent https://api.github.com/repos/BepInEx/BepInEx.ConfigurationManager/releases/latest)) -O BepInEx.ConfigurationManager.zip
+          unzip BepInEx.ConfigurationManager.zip -d MixMod_Windows/
+          unzip BepInEx.ConfigurationManager.zip -d MixMod_Mac/
+          wget https://github.com/sinai-dev/BepInExConfigManager/releases/latest/download/BepInExConfigManager.Mono.zip -O BepInExConfigManager.Mono.zip
+          unzip BepInExConfigManager.Mono.zip -d MixMod_Windows/BepInEx/
+          unzip BepInExConfigManager.Mono.zip -d MixMod_Mac/BepInEx/
+          cd MixMod_Windows/BepInEx
+          zip -9 ../../MixMod_${{ steps.version.outputs.version }}.zip ./plugins/MixMod.dll
+          cd ..
+          zip -9 -r ../MixMod_${{ steps.version.outputs.version }}_Full_Windows.zip ./*
+          cd ../MixMod_Mac/
+          zip -9 -r ../MixMod_${{ steps.version.outputs.version }}_Full_Mac.zip ./*
+      - uses: "ncipollo/release-action@v1"
+        with:
+          tag: "${{ steps.version.outputs.v-version }}"
+          name: "MixMod"
+          artifacts: "../Release/MixMod_*.zip"
