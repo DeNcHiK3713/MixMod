@@ -42,7 +42,7 @@ jobs:
           ./CASCConsole/CASCConsole -m Pattern -e Hearthstone_Data/Managed/Blizzard.T5.Configuration.dll -o -p hsb -l None -d ./
           ./CASCConsole/CASCConsole -m Pattern -e Hearthstone_Data/Managed/Blizzard.T5.Core.dll -o -p hsb -l None -d ./
           ./CASCConsole/CASCConsole -m Pattern -e Hearthstone.exe -o -p hsb -l None -d ./
-          UnityVersion=$(exiftool -UnityVersion -b Hearthstone.exe)
+          UnityVersion=$(exiftool -ProductVersion -b Hearthstone.exe)
           echo "unity_version=${UnityVersion%%f1*}" >> $GITHUB_ENV
           cd $repo_dir
       - name: Edit csproj file
