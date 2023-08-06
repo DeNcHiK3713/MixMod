@@ -24,7 +24,7 @@ namespace MixMod.Patches
             {
                 if (__instance.HasTag(GAME_TAG.HAS_DIAMOND_QUALITY))
                 {
-                    if (diamond == CardState.All || diamond == CardState.OnlyMy && __instance.IsControlledByFriendlySidePlayer())
+                    if (diamond == CardState.All || diamond == CardState.OnlyMy && __instance.IsControlledByFriendlySidePlayer2())
                     {
                         __result = TAG_PREMIUM.DIAMOND;
                         return false;
@@ -37,7 +37,7 @@ namespace MixMod.Patches
                 }
                 if (__instance.HasTag(GAME_TAG.HAS_SIGNATURE_QUALITY))
                 {
-                    if (signature == CardState.All || signature == CardState.OnlyMy && __instance.IsControlledByFriendlySidePlayer())
+                    if (signature == CardState.All || signature == CardState.OnlyMy && __instance.IsControlledByFriendlySidePlayer2())
                     {
                         __result = TAG_PREMIUM.SIGNATURE;
                         return false;
@@ -48,7 +48,7 @@ namespace MixMod.Patches
                         return false;
                     }
                 }
-                if (golden == CardState.All || (golden == CardState.OnlyMy && __instance.IsControlledByFriendlySidePlayer()))
+                if (golden == CardState.All || (golden == CardState.OnlyMy && __instance.IsControlledByFriendlySidePlayer2()))
                 {
                     __result = TAG_PREMIUM.GOLDEN;
                     return false;
@@ -60,6 +60,11 @@ namespace MixMod.Patches
                 }
             }
             return true;
+        }
+
+        private static bool IsControlledByFriendlySidePlayer2(this Entity _this)
+        {
+            return _this.GetController()?.IsFriendlySide() ?? false;
         }
     }
 }
