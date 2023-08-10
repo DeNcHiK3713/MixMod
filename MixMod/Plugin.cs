@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace MixMod
 {
-    [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
+    [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
     public class Plugin : BaseUnityPlugin
     {
         private void Awake()
@@ -67,7 +67,7 @@ namespace MixMod
             MixModConfig.Get().timeScaleInGameOnlyEntry.SettingChanged += (_, _) => TimeScaleMgr.Get().Update();
             var harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
             TimeScaleMgr.Get().Update();
-            Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded! (Patched {harmony.GetPatchedMethods().Count()} methods)");
+            Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded! (Patched {harmony.GetPatchedMethods().Count()} methods)");
         }
 
         private void Update()
