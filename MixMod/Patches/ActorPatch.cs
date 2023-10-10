@@ -2,29 +2,19 @@
 
 namespace MixMod.Patches
 {
-    [HarmonyPatch(typeof(Entity), nameof(Entity.LoadCard))]
-    public static class Entity_LoadCard
-    {        
-        public static bool Prefix(Entity __instance)
-        {
-            __instance.SetRealTimePremium(__instance.GetPremiumType());
-            return true;
-        }
-    }
-
-    [HarmonyPatch(typeof(Entity), nameof(Entity.GetPremiumType))]
-    public static class Entity_GetPremiumType
+    [HarmonyPatch(typeof(Actor), nameof(Actor.GetPremium))]
+    public static class Actor_GetPremium
     {
-        public static bool Prefix(Entity __instance, ref TAG_PREMIUM __result)
+        public static bool Prefix(Actor __instance, Entity ___m_entity, ref TAG_PREMIUM __result)
         {
             var diamond = MixModConfig.Get().DIAMOND;
             var signature = MixModConfig.Get().SIGNATURE;
             var golden = MixModConfig.Get().GOLDEN;
             if (GameMgr.Get() != null && !GameMgr.Get().IsBattlegrounds() && GameState.Get() != null && GameState.Get().IsGameCreatedOrCreating())
             {
-                if (__instance.HasTag(GAME_TAG.HAS_DIAMOND_QUALITY))
+                if (__instance.DoesDiamondModelExistOnCardDef())
                 {
-                    if (diamond == CardState.All || diamond == CardState.OnlyMy && __instance.IsControlledByFriendlySidePlayer2())
+                    if (diamond == CardState.All || diamond == CardState.OnlyMy && ___m_entity.IsControlledByFriendlySidePlayer2())
                     {
                         __result = TAG_PREMIUM.DIAMOND;
                         return false;
@@ -35,9 +25,9 @@ namespace MixMod.Patches
                         return false;
                     }
                 }
-                if (__instance.HasTag(GAME_TAG.HAS_SIGNATURE_QUALITY))
+                if (__instance.HasSignaturePortraitTexture())
                 {
-                    if (signature == CardState.All || signature == CardState.OnlyMy && __instance.IsControlledByFriendlySidePlayer2())
+                    if (signature == CardState.All || signature == CardState.OnlyMy && ___m_entity.IsControlledByFriendlySidePlayer2())
                     {
                         __result = TAG_PREMIUM.SIGNATURE;
                         return false;
@@ -48,7 +38,7 @@ namespace MixMod.Patches
                         return false;
                     }
                 }
-                if (golden == CardState.All || (golden == CardState.OnlyMy && __instance.IsControlledByFriendlySidePlayer2()))
+                if (golden == CardState.All || (golden == CardState.OnlyMy && ___m_entity.IsControlledByFriendlySidePlayer2()))
                 {
                     __result = TAG_PREMIUM.GOLDEN;
                     return false;
@@ -60,11 +50,6 @@ namespace MixMod.Patches
                 }
             }
             return true;
-        }
-
-        public static bool IsControlledByFriendlySidePlayer2(this Entity _this)
-        {
-            return _this?.GetController()?.IsFriendlySide() ?? false;
         }
     }
 }
