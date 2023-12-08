@@ -38,9 +38,6 @@ namespace MixMod
         internal ConfigEntry<bool> showOpponentRankInGameEntry;
         internal ConfigEntry<bool> moveEnemyCardsEntry;
         internal ConfigEntry<int> packIdToBuyEntry;
-        internal ConfigEntry<double> latitudeEntry;
-        internal ConfigEntry<double> longitudeEntry;
-        internal ConfigEntry<double> gpsAccuracyEntry;
         internal ConfigEntry<DevicePreset> devicePresetEntry;
         internal ConfigEntry<OSCategory> osEntry;
         internal ConfigEntry<ScreenCategory> screenEntry;
@@ -116,9 +113,6 @@ namespace MixMod
             showOpponentRankInGameEntry = config.Bind("Gameplay", "ShowOpponentRankInGame", false, "Включить отображение ранга текущего противника");
             moveEnemyCardsEntry = config.Bind("Others", "MoveEnemyCards", false, "Развернуть карты в руке оппонента в режиме зрителя");
             //packIdToBuyEntry = config.Bind("Others", "PackIdToBuy", 0, "ID пака для покупки");
-            latitudeEntry = config.Bind("Gifts", "Latitude", 0d, "Широта");
-            longitudeEntry = config.Bind("Gifts", "Longitude", 0d, "Долгота");
-            gpsAccuracyEntry = config.Bind("Gifts", "GpsAccuracy", 54d, "Точность определения местоположения");
             devicePresetEntry = config.Bind("Gifts", "DevicePreset", DevicePreset.Default, "Имитация устройств");
 #if DEBUG
             testShortcutEntry = config.Bind("Shortcuts", "TestShortcut", new KeyboardShortcut(KeyCode.U, KeyCode.LeftControl), "Клавиша для тестов");
@@ -229,9 +223,6 @@ namespace MixMod
         public bool ShowOpponentRankInGame { get => showOpponentRankInGameEntry.Value; set => showOpponentRankInGameEntry.Value = value; }
         public bool MoveEnemyCards { get => moveEnemyCardsEntry.Value; set => moveEnemyCardsEntry.Value = value; }
         public int PackIdToBuy { get => packIdToBuyEntry.Value; set => packIdToBuyEntry.Value = value; }
-        public double Latitude { get => latitudeEntry.Value; set => latitudeEntry.Value = value; }
-        public double Longitude { get => longitudeEntry.Value; set => longitudeEntry.Value = value; }
-        public double GpsAccuracy { get => gpsAccuracyEntry.Value; set => gpsAccuracyEntry.Value = value; }
         public DevicePreset DevicePreset { get => devicePresetEntry.Value; set => devicePresetEntry.Value = value; }
         public OSCategory Os { get => osEntry.Value; set => osEntry.Value = value; }
         public ScreenCategory Screen { get => screenEntry.Value; set => screenEntry.Value = value; }
