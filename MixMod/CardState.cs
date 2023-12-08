@@ -1,16 +1,17 @@
-﻿using System.ComponentModel;
+﻿using MixMod.Properties;
+using System.ComponentModel;
 
 namespace MixMod
 {
     public enum CardState
     {
-        [Description("Обычный режим, все карты и герои отображаются правильно")]
+        [LocalizedDescription(typeof(MixModLocalization), "CardState.Default")]
         Default,
-        [Description("Все ваши герои и карты во время матча будут изменены")]
+        [LocalizedDescription(typeof(MixModLocalization), "CardState.OnlyMy")]
         OnlyMy,
-        [Description("Все герои и карты во время матча будут изменены")]
+        [LocalizedDescription(typeof(MixModLocalization), "CardState.All")]
         All,
-        [Description("Все герои и карты во время матча будут обычными, без анимаций")]
+        [LocalizedDescription(typeof(MixModLocalization), "CardState.Disabled")]
         Disabled
     }
 }

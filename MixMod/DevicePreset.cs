@@ -1,24 +1,25 @@
-﻿using System.ComponentModel;
+﻿using MixMod.Properties;
+using System.ComponentModel;
 
 namespace MixMod
 {
     public enum DevicePreset
     {
-        [Description("Стандартные настройки")]
+        [LocalizedDescription(typeof(MixModLocalization), "DevicePreset.Default")]
         Default,
-        [Description("Настройки для iPad")]
+        [LocalizedDescription(typeof(MixModLocalization), "DevicePreset.iPad")]
         iPad,
-        [Description("Настройки для iPhone")]
+        [LocalizedDescription(typeof(MixModLocalization), "DevicePreset.iPhone")]
         iPhone,
-        [Description("Настройки для телефона Android")]
+        [LocalizedDescription(typeof(MixModLocalization), "DevicePreset.Phone")]
         Phone,
-        [Description("Настройки для планшета Android")]
+        [LocalizedDescription(typeof(MixModLocalization), "DevicePreset.Tablet")]
         Tablet,
-        [Description("Настройки для телефона Huawei")]
+        [LocalizedDescription(typeof(MixModLocalization), "DevicePreset.HuaweiPhone")]
         HuaweiPhone,
-        [Description("Настройки для компьютера Mac")]
+        [LocalizedDescription(typeof(MixModLocalization), "DevicePreset.Mac")]
         Mac,
-        [Description("Свои настройки")]
+        [LocalizedDescription(typeof(MixModLocalization), "DevicePreset.Custom")]
         Custom
     }
 }

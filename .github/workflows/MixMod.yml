@@ -41,6 +41,7 @@ jobs:
           ./CASCConsole/CASCConsole -m Pattern -e Hearthstone_Data/Managed/blizzard.bgsclient.dll -o -p hsb -l None -d ./
           ./CASCConsole/CASCConsole -m Pattern -e Hearthstone_Data/Managed/Blizzard.T5.Configuration.dll -o -p hsb -l None -d ./
           ./CASCConsole/CASCConsole -m Pattern -e Hearthstone_Data/Managed/Blizzard.T5.Core.dll -o -p hsb -l None -d ./
+          ./CASCConsole/CASCConsole -m Pattern -e Hearthstone_Data/Managed/Blizzard.T5.Localization.dll -o -p hsb -l None -d ./
           ./CASCConsole/CASCConsole -m Pattern -e Hearthstone.exe -o -p hsb -l None -d ./
           UnityVersion=$(exiftool -ProductVersion -b Hearthstone.exe)
           echo "unity_version=${UnityVersion%%f1*}" >> $GITHUB_ENV
@@ -85,9 +86,9 @@ jobs:
           Env = eu.actual.battle.net
           EOF
           mkdir ./MixMod_Windows/BepInEx/plugins/
-          cp ${repo_dir}/MixMod/bin/Release/net46/MixMod.dll ./MixMod_Windows/BepInEx/plugins/
+          cp -r ${repo_dir}/MixMod/bin/Release/net46/MixMod.dll $(ls -d ${repo_dir}/MixMod/bin/Release/net46/*/) ./MixMod_Windows/BepInEx/plugins/
           mkdir ./MixMod_Mac/BepInEx/plugins/
-          cp ${repo_dir}/MixMod/bin/Release/net46/MixMod.dll ./MixMod_Mac/BepInEx/plugins/
+          cp -r ${repo_dir}/MixMod/bin/Release/net46/MixMod.dll $(ls -d ${repo_dir}/MixMod/bin/Release/net46/*/) ./MixMod_Mac/BepInEx/plugins/
           wget $(jq -r '.assets | first | .browser_download_url' <<< $(curl --silent https://api.github.com/repos/BepInEx/BepInEx.ConfigurationManager/releases/latest)) -O BepInEx.ConfigurationManager.zip
           unzip BepInEx.ConfigurationManager.zip -d MixMod_Windows/
           unzip BepInEx.ConfigurationManager.zip -d MixMod_Mac/
@@ -95,7 +96,7 @@ jobs:
           unzip BepInExConfigManager.Mono.zip -d MixMod_Windows/BepInEx/
           unzip BepInExConfigManager.Mono.zip -d MixMod_Mac/BepInEx/
           cd MixMod_Windows/BepInEx
-          zip -9 ../../MixMod_${{ steps.version.outputs.version }}.zip ./plugins/MixMod.dll
+          zip -9 -r ../../MixMod_${{ steps.version.outputs.version }}.zip ./plugins/MixMod.dll $(ls -d ./plugins/*/)
           cd ..
           zip -9 -r ../MixMod_${{ steps.version.outputs.version }}_Full_Windows.zip ./*
           cd ../MixMod_Mac/

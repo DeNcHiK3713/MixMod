@@ -65,6 +65,7 @@ namespace MixMod
             };
             MixModConfig.Get().timeScaleEntry.SettingChanged += (_, _) => TimeScaleMgr.Get().Update();
             MixModConfig.Get().timeScaleInGameOnlyEntry.SettingChanged += (_, _) => TimeScaleMgr.Get().Update();
+            MixModConfig.Get().languageEntry.SettingChanged += (_, _) => MixModConfig.Get().ReloadLocalization();
             var harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
             TimeScaleMgr.Get().Update();
             Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded! (Patched {harmony.GetPatchedMethods().Count()} methods)");
@@ -112,7 +113,7 @@ namespace MixMod
                     MixModConfig.Get().TimeScale = timeScale;
                     return;
                 }
-                if (MixModConfig.Get().DevideTimeScaleShortcut.IsDown())
+                if (MixModConfig.Get().DivideTimeScaleShortcut.IsDown())
                 {
                     float timeScale = MixModConfig.Get().TimeScale - 1f;
                     float minTimeScale = 1f;

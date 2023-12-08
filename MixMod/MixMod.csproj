@@ -41,5 +41,23 @@
     <Reference Include="Blizzard.T5.Core">
       <HintPath>..\..\downloads\Hearthstone_Data\Managed\Blizzard.T5.Core.dll</HintPath>
     </Reference>
+    <Reference Include="Blizzard.T5.Localization">
+      <HintPath>..\..\downloads\Hearthstone_Data\Managed\Blizzard.T5.Localization.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Compile Update="Properties\MixModLocalization.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>MixModLocalization.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\MixModLocalization.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>MixModLocalization.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>

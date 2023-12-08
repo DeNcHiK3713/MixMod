@@ -1,7 +1,10 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
+using MixMod.Properties;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -14,11 +17,14 @@ namespace MixMod
     {
         private static MixModConfig _mixModConfig;
         private static PropertyInfo orphanedEntriesInfo = typeof(ConfigFile).GetProperty("OrphanedEntries", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static FieldInfo configDescriptionDescriptionInfo = typeof(ConfigDescription).GetField("<Description>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static PropertyInfo descriptionAttributeDescriptionValueInfo = typeof(DescriptionAttribute).GetProperty("DescriptionValue", BindingFlags.NonPublic | BindingFlags.Instance);
         private readonly ConfigFile _config;
 
         internal ConfigEntry<bool> devEnabledEntry;
         internal ConfigEntry<bool> isInternalEntry;
         internal ConfigEntry<int> boardEntry;
+        internal ConfigEntry<AvailableLanguages> languageEntry;
         internal ConfigEntry<CardState> goldenCoinEntry;
         internal ConfigEntry<bool> enableShortcutsEntry;
         internal ConfigEntry<bool> timeScaleEnabledEntry;
@@ -48,7 +54,7 @@ namespace MixMod
         internal ConfigEntry<KeyboardShortcut> resetTimeScaleShortcutEntry;
         internal ConfigEntry<KeyboardShortcut> maxTimeScaleShortcutEntry;
         internal ConfigEntry<KeyboardShortcut> doubleTimeScaleShortcutEntry;
-        internal ConfigEntry<KeyboardShortcut> devideTimeScaleShortcutEntry;
+        internal ConfigEntry<KeyboardShortcut> divideTimeScaleShortcutEntry;
         internal ConfigEntry<KeyboardShortcut> concedeShortcutEntry;
         internal ConfigEntry<KeyboardShortcut> continueMulliganShortcutEntry;
         internal ConfigEntry<KeyboardShortcut> squelchShortcutEntry;
@@ -68,60 +74,62 @@ namespace MixMod
         public MixModConfig(ConfigFile config)
         {
             _config = config;
+            languageEntry = config.Bind("Global", "Language", AvailableLanguages.Default, MixModLocalization.Global_Language);
+            ReloadLocalization();
 #if DEBUG
-            devEnabledEntry = config.Bind("Dev", "DevEnabled", false, "Режим разработчика мода");
-            isInternalEntry = config.Bind("Dev", "IsInternal", false, "Режим разработчика игры");
-            boardEntry = config.Bind("Dev", "Board", 0, "Номер игрового поля для замены");
-            goldenCoinEntry = config.Bind("Dev", "GoldenCoin", CardState.Default, "Изменения для монеток");
+            devEnabledEntry = config.Bind("Dev", "DevEnabled", false, MixModLocalization.Dev_DevEnabled);
+            isInternalEntry = config.Bind("Dev", "IsInternal", false, MixModLocalization.Dev_IsInternal);
+            boardEntry = config.Bind("Dev", "Board", 0, MixModLocalization.Dev_Board);
+            goldenCoinEntry = config.Bind("Dev", "GoldenCoin", CardState.Default, MixModLocalization.Dev_GoldenCoin);
 #else
             var orphanedEntries = orphanedEntriesInfo?.GetValue(config) as Dictionary<ConfigDefinition, string>;
             if (orphanedEntries is not null)
             {
                 if (orphanedEntries.Any(x => x.Key.Section == "Dev" && x.Key.Key == "DevEnabled"))
                 {
-                    devEnabledEntry = config.Bind("Dev", "DevEnabled", false, "Режим разработчика мода");
+                    devEnabledEntry = config.Bind("Dev", "DevEnabled", false, MixModLocalization.Dev_DevEnabled);
                 }
                 if (orphanedEntries.Any(x => x.Key.Section == "Dev" && x.Key.Key == "IsInternal"))
                 {
-                    isInternalEntry = config.Bind("Dev", "IsInternal", false, "Режим разработчика игры");
+                    isInternalEntry = config.Bind("Dev", "IsInternal", false, MixModLocalization.Dev_IsInternal);
                 }
                 if (orphanedEntries.Any(x => x.Key.Section == "Dev" && x.Key.Key == "Board"))
                 {
-                    boardEntry = config.Bind("Dev", "Board", 0, "Номер игрового поля для замены");
+                    boardEntry = config.Bind("Dev", "Board", 0, MixModLocalization.Dev_Board);
                 }
                 if (orphanedEntries.Any(x => x.Key.Section == "Dev" && x.Key.Key == "GoldenCoin"))
                 {
-                    goldenCoinEntry = config.Bind("Dev", "GoldenCoin", CardState.Default, "Изменения для монеток");
+                    goldenCoinEntry = config.Bind("Dev", "GoldenCoin", CardState.Default, MixModLocalization.Dev_GoldenCoin);
                 }
             }
 #endif
-            enableShortcutsEntry = config.Bind("Global", "EnableShortcuts", false, "Включить горячие клавиши");
-            timeScaleEnabledEntry = config.Bind("Global", "TimeScaleEnabled", false, "Включить ускорение анимации");
-            timeScaleInGameOnlyEntry = config.Bind("Global", "TimeScaleInGameOnly", false, "Ускорение анимации только в игре");
-            timeScaleEntry = config.Bind("Global", "TimeScale", 1f, new ConfigDescription("Значение для ускорения анимации", new AcceptableValueRange<float>(1f, 8f)));
-            skipHeroIntroEntry = config.Bind("Gameplay", "SkipHeroIntro", false, "Отключить анимацию представления героев");
-            shutUpBobEntry = config.Bind("Gameplay", "ShutUpBob", false, "Отключить комментарии Боба на полях сражений");
-            extendedBMEntry = config.Bind("Gameplay", "ExtendedBM", false, "Убрать ограничение на использование эмоций");
-            disableRandomForEmotesEntry = config.Bind("Gameplay", "DisableRandomForEmotes", false, "Отключить использование случайных эмоции, если все цели выбираются случайно");
-            //UseExtendedEmotesEntry = config.Bind("Gameplay", "UseExtendedEmotes", false, "Включить использование расширенных эмоций");
-            emoteSpamBlockerEntry = config.Bind("Gameplay", "EmoteSpamBlocker", false, "Включить блокировщик спама эмоциями");
-            emotesBeforeBlockEntry = config.Bind("Gameplay", "EmotesBeforeBlock", 0, "Количество эмоции оппонента за 10 секунд, которое оппонент может сказать. При превышении этого числа, его эмоции будут отключены\n0 для отключения эмоций в начале матча");
-            disableThinkEmotesEntry = config.Bind("Gameplay", "DisableThinkEmotes", false, "Отключить эмоции раздумья героев");
-            goldenEntry = config.Bind("Gameplay", "GOLDEN", CardState.Default, "Изменения для золотых карт");
-            diamondEntry = config.Bind("Gameplay", "DIAMOND", CardState.Default, "Изменения для бриллиантовых карт");
-            signatureEntry = config.Bind("Gameplay", "SIGNATURE", CardState.Default, "Изменения для сигнатурных карт");
-            showOpponentRankInGameEntry = config.Bind("Gameplay", "ShowOpponentRankInGame", false, "Включить отображение ранга текущего противника");
-            moveEnemyCardsEntry = config.Bind("Others", "MoveEnemyCards", false, "Развернуть карты в руке оппонента в режиме зрителя");
-            //packIdToBuyEntry = config.Bind("Others", "PackIdToBuy", 0, "ID пака для покупки");
-            devicePresetEntry = config.Bind("Gifts", "DevicePreset", DevicePreset.Default, "Имитация устройств");
+            enableShortcutsEntry = config.Bind("Global", "EnableShortcuts", false, MixModLocalization.Global_EnableShortcuts);
+            timeScaleEnabledEntry = config.Bind("Global", "TimeScaleEnabled", false, MixModLocalization.Global_TimeScaleEnabled);
+            timeScaleInGameOnlyEntry = config.Bind("Global", "TimeScaleInGameOnly", false, MixModLocalization.Global_TimeScaleInGameOnly);
+            timeScaleEntry = config.Bind("Global", "TimeScale", 1f, new ConfigDescription(MixModLocalization.Global_TimeScale, new AcceptableValueRange<float>(1f, 8f)));
+            skipHeroIntroEntry = config.Bind("Gameplay", "SkipHeroIntro", false, MixModLocalization.Gameplay_SkipHeroIntro);
+            shutUpBobEntry = config.Bind("Gameplay", "ShutUpBob", false, MixModLocalization.Gameplay_ShutUpBob);
+            extendedBMEntry = config.Bind("Gameplay", "ExtendedBM", false, MixModLocalization.Gameplay_ExtendedBM);
+            disableRandomForEmotesEntry = config.Bind("Gameplay", "DisableRandomForEmotes", false, MixModLocalization.Gameplay_DisableRandomForEmotes);
+            //UseExtendedEmotesEntry = config.Bind("Gameplay", "UseExtendedEmotes", false, MixModLocalization.Gameplay_UseExtendedEmotes);
+            emoteSpamBlockerEntry = config.Bind("Gameplay", "EmoteSpamBlocker", false, MixModLocalization.Gameplay_EmoteSpamBlocker);
+            emotesBeforeBlockEntry = config.Bind("Gameplay", "EmotesBeforeBlock", 0, MixModLocalization.Gameplay_EmotesBeforeBlock);
+            disableThinkEmotesEntry = config.Bind("Gameplay", "DisableThinkEmotes", false, MixModLocalization.Gameplay_DisableThinkEmotes);
+            goldenEntry = config.Bind("Gameplay", "GOLDEN", CardState.Default, MixModLocalization.Gameplay_GOLDEN);
+            diamondEntry = config.Bind("Gameplay", "DIAMOND", CardState.Default, MixModLocalization.Gameplay_DIAMOND);
+            signatureEntry = config.Bind("Gameplay", "SIGNATURE", CardState.Default, MixModLocalization.Gameplay_SIGNATURE);
+            showOpponentRankInGameEntry = config.Bind("Gameplay", "ShowOpponentRankInGame", false, MixModLocalization.Gameplay_ShowOpponentRankInGame);
+            moveEnemyCardsEntry = config.Bind("Others", "MoveEnemyCards", false, MixModLocalization.Others_MoveEnemyCards);
+            //packIdToBuyEntry = config.Bind("Others", "PackIdToBuy", 0, MixModLocalization.Others_PackIdToBuy);
+            devicePresetEntry = config.Bind("Gifts", "DevicePreset", DevicePreset.Default, MixModLocalization.Gifts_DevicePreset);
 #if DEBUG
-            testShortcutEntry = config.Bind("Shortcuts", "TestShortcut", new KeyboardShortcut(KeyCode.U, KeyCode.LeftControl), "Клавиша для тестов");
+            testShortcutEntry = config.Bind("Shortcuts", "TestShortcut", new KeyboardShortcut(KeyCode.U, KeyCode.LeftControl), MixModLocalization.Shortcuts_TestShortcut);
 #else
             if (orphanedEntries is not null)
             {
                 if (orphanedEntries.Any(x => x.Key.Section == "Shortcuts" && x.Key.Key == "TestShortcut"))
                 {
-                    testShortcutEntry = config.Bind("Shortcuts", "TestShortcut", new KeyboardShortcut(KeyCode.U, KeyCode.LeftControl), "Клавиша для тестов");
+                    testShortcutEntry = config.Bind("Shortcuts", "TestShortcut", new KeyboardShortcut(KeyCode.U, KeyCode.LeftControl), MixModLocalization.Shortcuts_TestShortcut);
                 }
             }
 #endif
@@ -129,7 +137,7 @@ namespace MixMod
             resetTimeScaleShortcutEntry = config.Bind("Shortcuts", "ResetTimeScale", new KeyboardShortcut(KeyCode.LeftArrow));
             maxTimeScaleShortcutEntry = config.Bind("Shortcuts", "MaxTimeScale", new KeyboardShortcut(KeyCode.RightArrow));
             doubleTimeScaleShortcutEntry = config.Bind("Shortcuts", "DoubleTimeScale", new KeyboardShortcut(KeyCode.UpArrow));
-            devideTimeScaleShortcutEntry = config.Bind("Shortcuts", "DevideTimeScale", new KeyboardShortcut(KeyCode.DownArrow));
+            divideTimeScaleShortcutEntry = config.Bind("Shortcuts", "DevideTimeScale", new KeyboardShortcut(KeyCode.DownArrow));
             concedeShortcutEntry = config.Bind("Shortcuts", "Concede", new KeyboardShortcut(KeyCode.Space, KeyCode.LeftControl));
             continueMulliganShortcutEntry = config.Bind("Shortcuts", "ContinueMulligan", new KeyboardShortcut(KeyCode.Space));
             squelchShortcutEntry = config.Bind("Shortcuts", "Squelch", new KeyboardShortcut(KeyCode.C));
@@ -152,6 +160,34 @@ namespace MixMod
             _mixModConfig = new MixModConfig(config);
         }
 
+        public void ReloadLocalization()
+        {
+            if (languageEntry.Value == AvailableLanguages.Default)
+            {
+                if (Localization.GetCultureInfo() is null)
+                {
+                    return;
+                }
+                MixModLocalization.Culture = Localization.GetCultureInfo();
+            }
+            else
+            {
+                var localeString = languageEntry.Value.ToString();
+                MixModLocalization.Culture = CultureInfo.GetCultureInfo(string.Format("{0}-{1}", localeString.Substring(0, 2), localeString.Substring(2, 2)));
+            }
+            foreach (var entry in _config)
+            {
+                if (entry.Value.Description is not null && entry.Value.Description != ConfigDescription.Empty)
+                {
+                    var description = MixModLocalization.ResourceManager.GetString($"{entry.Key.Section}.{entry.Key.Key}", MixModLocalization.Culture);
+                    if (description is not null)
+                    {
+                        configDescriptionDescriptionInfo.SetValue(entry.Value.Description, description);
+                    }
+                }
+            }
+        }
+
         public static MixModConfig Get()
         {
             return _mixModConfig;
@@ -164,7 +200,7 @@ namespace MixMod
             {
                 if (devEnabledEntry is null)
                 {
-                    devEnabledEntry = _config.Bind("Dev", "DevEnabled", false, "Режим разработчика мода");
+                    devEnabledEntry = _config.Bind("Dev", "DevEnabled", false, MixModLocalization.Dev_DevEnabled);
                 }
                 devEnabledEntry.Value = value;
             }
@@ -176,7 +212,7 @@ namespace MixMod
             {
                 if (isInternalEntry is null)
                 {
-                    isInternalEntry = _config.Bind("Dev", "IsInternal", false, "Режим разработчика игры");
+                    isInternalEntry = _config.Bind("Dev", "IsInternal", false, MixModLocalization.Dev_IsInternal);
                 }
                 isInternalEntry.Value = value;
             }
@@ -188,7 +224,7 @@ namespace MixMod
             {
                 if (boardEntry is null)
                 {
-                    boardEntry = _config.Bind("Dev", "Board", 0, "Номер игрового поля для замены");
+                    boardEntry = _config.Bind("Dev", "Board", 0, MixModLocalization.Dev_Board);
                 }
                 boardEntry.Value = value;
             }
@@ -200,12 +236,13 @@ namespace MixMod
             {
                 if (goldenCoinEntry is null)
                 {
-                    goldenCoinEntry = _config.Bind("Dev", "GoldenCoin", CardState.Default, "Изменения для монеток");
+                    goldenCoinEntry = _config.Bind("Dev", "GoldenCoin", CardState.Default, MixModLocalization.Dev_GoldenCoin);
                 }
                 goldenCoinEntry.Value = value;
             }
         }
         public bool EnableShortcuts { get => enableShortcutsEntry.Value; set => enableShortcutsEntry.Value = value; }
+        public AvailableLanguages Language { get => languageEntry.Value; set => languageEntry.Value = value; }
         public bool TimeScaleEnabled { get => timeScaleEnabledEntry.Value; set => timeScaleEnabledEntry.Value = value; }
         public bool TimeScaleInGameOnly { get => timeScaleInGameOnlyEntry.Value; set => timeScaleInGameOnlyEntry.Value = value; }
         public float TimeScale { get => timeScaleEntry.Value; set => timeScaleEntry.Value = value; }
@@ -237,7 +274,7 @@ namespace MixMod
             {
                 if (testShortcutEntry is null)
                 {
-                    testShortcutEntry = _config.Bind("Shortcuts", "TestShortcut", new KeyboardShortcut(KeyCode.U, KeyCode.LeftControl), "Клавиша для тестов");
+                    testShortcutEntry = _config.Bind("Shortcuts", "TestShortcut", new KeyboardShortcut(KeyCode.U, KeyCode.LeftControl), MixModLocalization.Shortcuts_TestShortcut);
                 }
                 testShortcutEntry.Value = value;
             }
@@ -246,7 +283,7 @@ namespace MixMod
         public KeyboardShortcut ResetTimeScaleShortcut { get => resetTimeScaleShortcutEntry.Value; set => resetTimeScaleShortcutEntry.Value = value; }
         public KeyboardShortcut MaxTimeScaleShortcut { get => maxTimeScaleShortcutEntry.Value; set => maxTimeScaleShortcutEntry.Value = value; }
         public KeyboardShortcut DoubleTimeScaleShortcut { get => doubleTimeScaleShortcutEntry.Value; set => doubleTimeScaleShortcutEntry.Value = value; }
-        public KeyboardShortcut DevideTimeScaleShortcut { get => devideTimeScaleShortcutEntry.Value; set => devideTimeScaleShortcutEntry.Value = value; }
+        public KeyboardShortcut DivideTimeScaleShortcut { get => divideTimeScaleShortcutEntry.Value; set => divideTimeScaleShortcutEntry.Value = value; }
         public KeyboardShortcut ConcedeShortcut { get => concedeShortcutEntry.Value; set => concedeShortcutEntry.Value = value; }
         public KeyboardShortcut ContinueMulliganShortcut { get => continueMulliganShortcutEntry.Value; set => continueMulliganShortcutEntry.Value = value; }
         public KeyboardShortcut SquelchShortcut { get => squelchShortcutEntry.Value; set => squelchShortcutEntry.Value = value; }
