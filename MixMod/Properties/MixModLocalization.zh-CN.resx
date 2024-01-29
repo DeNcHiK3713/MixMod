@@ -118,126 +118,126 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AvailableLanguages.Default" xml:space="preserve">
-    <value>Использовать язык игры</value>
+    <value>使用游戏语言</value>
   </data>
   <data name="CardState.All" xml:space="preserve">
-    <value>Все герои и карты во время матча будут изменены</value>
+    <value>比赛期间所有英雄和卡牌都会发生变化</value>
   </data>
   <data name="CardState.Default" xml:space="preserve">
-    <value>Обычный режим, все карты и герои отображаются правильно</value>
+    <value>普通模式，所有卡牌和英雄均正确显示</value>
   </data>
   <data name="CardState.Disabled" xml:space="preserve">
-    <value>Все герои и карты во время матча будут обычными, без анимаций</value>
+    <value>比赛中所有英雄和卡牌都会正常，没有动画</value>
   </data>
   <data name="CardState.OnlyMy" xml:space="preserve">
-    <value>Все ваши герои и карты во время матча будут изменены</value>
+    <value>你的所有英雄和卡牌都会在比赛期间改变</value>
   </data>
   <data name="Dev.Board" xml:space="preserve">
-    <value>Номер игрового поля для замены</value>
+    <value>板号</value>
   </data>
   <data name="Dev.DevEnabled" xml:space="preserve">
-    <value>Режим разработчика мода</value>
+    <value>开发者模式（mod）</value>
   </data>
   <data name="Dev.GoldenCoin" xml:space="preserve">
-    <value>Изменения для монеток</value>
+    <value>硬币的变化</value>
   </data>
   <data name="Dev.IsInternal" xml:space="preserve">
-    <value>Режим разработчика игры</value>
+    <value>开发者模式（游戏）</value>
   </data>
   <data name="DevicePreset.Custom" xml:space="preserve">
-    <value>Свои настройки</value>
+    <value>您的设置</value>
   </data>
   <data name="DevicePreset.Default" xml:space="preserve">
-    <value>Стандартные настройки</value>
+    <value>标准设置</value>
   </data>
   <data name="DevicePreset.HuaweiPhone" xml:space="preserve">
-    <value>Настройки для телефона Huawei</value>
+    <value>华为手机设置</value>
   </data>
   <data name="DevicePreset.iPad" xml:space="preserve">
-    <value>Настройки для iPad</value>
+    <value>iPad 的设置</value>
   </data>
   <data name="DevicePreset.iPhone" xml:space="preserve">
-    <value>Настройки для iPhone</value>
+    <value>iPhone 的设置</value>
   </data>
   <data name="DevicePreset.Mac" xml:space="preserve">
-    <value>Настройки для компьютера Mac</value>
+    <value>Mac 的设置</value>
   </data>
   <data name="DevicePreset.Phone" xml:space="preserve">
-    <value>Настройки для телефона Android</value>
+    <value>Android 手机的设置</value>
   </data>
   <data name="DevicePreset.Tablet" xml:space="preserve">
-    <value>Настройки для планшета Android</value>
+    <value>Android 平板电脑的设置</value>
   </data>
   <data name="Gameplay.DIAMOND" xml:space="preserve">
-    <value>Изменения для бриллиантовых карт</value>
+    <value>钻石卡的变化</value>
   </data>
   <data name="Gameplay.DisableRandomForEmotes" xml:space="preserve">
-    <value>Отключить использование случайных эмоции, если все цели выбираются случайно</value>
+    <value>如果所有目标都是随机选择的，则禁用随机表情</value>
   </data>
   <data name="Gameplay.DisableThinkEmotes" xml:space="preserve">
-    <value>Отключить эмоции раздумья героев</value>
+    <value>禁用角色的情绪和思想</value>
   </data>
   <data name="Gameplay.EmotesBeforeBlock" xml:space="preserve">
-    <value>Количество эмоции оппонента за 10 секунд, которое оппонент может сказать. При превышении этого числа, его эмоции будут отключены\n0 для отключения эмоций в начале матча</value>
+    <value>对手在 10 秒内可以说出的情绪量。 如果超过这个数字，他的情绪将被禁用\n0在比赛开始时禁用情绪</value>
   </data>
   <data name="Gameplay.EmoteSpamBlocker" xml:space="preserve">
-    <value>Включить блокировщик спама эмоциями</value>
+    <value>启用表情垃圾邮件拦截器</value>
   </data>
   <data name="Gameplay.ExtendedBM" xml:space="preserve">
-    <value>Убрать ограничение на использование эмоций</value>
+    <value>消除对情感使用的限制</value>
   </data>
   <data name="Gameplay.GOLDEN" xml:space="preserve">
-    <value>Изменения для золотых карт</value>
+    <value>金卡变更</value>
   </data>
   <data name="Gameplay.ShowOpponentRankInGame" xml:space="preserve">
-    <value>Включить отображение ранга текущего противника</value>
+    <value>启用显示当前敌人的等级</value>
   </data>
   <data name="Gameplay.ShutUpBob" xml:space="preserve">
-    <value>Отключить комментарии Боба на полях сражений</value>
+    <value>禁用鲍勃在战场上的评论</value>
   </data>
   <data name="Gameplay.SIGNATURE" xml:space="preserve">
-    <value>Изменения для сигнатурных карт</value>
+    <value>签名卡的变更</value>
   </data>
   <data name="Gameplay.SkipHeroIntro" xml:space="preserve">
-    <value>Отключить анимацию представления героев</value>
+    <value>禁用英雄介绍动画</value>
   </data>
   <data name="Gameplay.UseExtendedEmotes" xml:space="preserve">
-    <value>Включить использование расширенных эмоций</value>
+    <value>启用高级情感的使用</value>
   </data>
   <data name="Gifts.DevicePreset" xml:space="preserve">
-    <value>Имитация устройств</value>
+    <value>设备模拟</value>
   </data>
   <data name="GiftsDeviceName" xml:space="preserve">
-    <value>Имя устройства для эмуляции</value>
+    <value>仿真设备名称</value>
   </data>
   <data name="GiftsOS" xml:space="preserve">
-    <value>Тип операционной системы для эмуляции другого устройства</value>
+    <value>用于模拟另一个设备的操作系统类型</value>
   </data>
   <data name="GiftsScreen" xml:space="preserve">
-    <value>Экран для эмуляции</value>
+    <value>仿真屏幕</value>
   </data>
   <data name="Global.EnableShortcuts" xml:space="preserve">
-    <value>Включить горячие клавиши</value>
+    <value>启用热键</value>
   </data>
   <data name="Global.Language" xml:space="preserve">
-    <value>Язык</value>
+    <value>语言</value>
   </data>
   <data name="Global.TimeScale" xml:space="preserve">
-    <value>Значение для ускорения анимации</value>
+    <value>时间刻度值</value>
   </data>
   <data name="Global.TimeScaleEnabled" xml:space="preserve">
-    <value>Включить ускорение анимации</value>
+    <value>启用时间刻度</value>
   </data>
   <data name="Global.TimeScaleInGameOnly" xml:space="preserve">
-    <value>Ускорение анимации только в игре</value>
+    <value>时间刻度仅在游戏中</value>
   </data>
   <data name="Others.MoveEnemyCards" xml:space="preserve">
-    <value>Развернуть карты в руке оппонента в режиме зрителя</value>
+    <value>在旁观模式下展开对手手中的牌</value>
   </data>
   <data name="Others.PackIdToBuy" xml:space="preserve">
-    <value>ID пака для покупки</value>
+    <value>购买包ID</value>
   </data>
   <data name="Shortcuts.TestShortcut" xml:space="preserve">
-    <value>Клавиша для тестов</value>
+    <value>测试键</value>
   </data>
 </root>

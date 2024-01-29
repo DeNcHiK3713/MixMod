@@ -207,6 +207,15 @@
   <data name="Gifts.DevicePreset" xml:space="preserve">
     <value>Device simulation</value>
   </data>
+  <data name="GiftsDeviceName" xml:space="preserve">
+    <value>Device name for emulation</value>
+  </data>
+  <data name="GiftsOS" xml:space="preserve">
+    <value>Operating system type for emulating another device</value>
+  </data>
+  <data name="GiftsScreen" xml:space="preserve">
+    <value>Screen for emulation</value>
+  </data>
   <data name="Global.EnableShortcuts" xml:space="preserve">
     <value>Enable hotkeys</value>
   </data>

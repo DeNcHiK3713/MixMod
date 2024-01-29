@@ -331,6 +331,33 @@ namespace MixMod.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Device name for emulation.
+        /// </summary>
+        internal static string GiftsDeviceName {
+            get {
+                return ResourceManager.GetString("GiftsDeviceName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Operating system type for emulating another device.
+        /// </summary>
+        internal static string GiftsOS {
+            get {
+                return ResourceManager.GetString("GiftsOS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Screen for emulation.
+        /// </summary>
+        internal static string GiftsScreen {
+            get {
+                return ResourceManager.GetString("GiftsScreen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Enable hotkeys.
         /// </summary>
         internal static string Global_EnableShortcuts {

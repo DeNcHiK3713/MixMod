@@ -4,6 +4,7 @@ using Blizzard.T5.Core.Time;
 using HarmonyLib;
 using Hearthstone.Commerce;
 using MixMod.Patches;
+using MixMod.Properties;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -24,15 +25,15 @@ namespace MixMod
                 {
                     if (MixModConfig.Get().osEntry is null)
                     {
-                        MixModConfig.Get().osEntry = Config.Bind("Gifts", "OS", PlatformSettings.OS, "Тип операционной системы для эмуляции другого устройства");
+                        MixModConfig.Get().osEntry = Config.Bind("Gifts", "OS", PlatformSettings.OS, MixModLocalization.GiftsOS);
                     }
                     if (MixModConfig.Get().screenEntry is null)
                     {
-                        MixModConfig.Get().screenEntry = Config.Bind("Gifts", "Screen", PlatformSettings.Screen, "Экран для эмуляции");
+                        MixModConfig.Get().screenEntry = Config.Bind("Gifts", "Screen", PlatformSettings.Screen, MixModLocalization.GiftsScreen);
                     }
                     if (MixModConfig.Get().deviceNameEntry is null)
                     {
-                        MixModConfig.Get().deviceNameEntry = Config.Bind("Gifts", "DeviceName", PlatformSettings.DeviceName, "Имя устройства для эмуляции");
+                        MixModConfig.Get().deviceNameEntry = Config.Bind("Gifts", "DeviceName", PlatformSettings.DeviceName, MixModLocalization.GiftsDeviceName);
                     }
                     //if (MixModConfig.Get().operatingSystemEntry is null)
                     //{
