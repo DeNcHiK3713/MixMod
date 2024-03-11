@@ -240,4 +240,7 @@
   <data name="Shortcuts.TestShortcut" xml:space="preserve">
     <value>Клавиша для тестов</value>
   </data>
+  <data name="Others.DisableMassPackOpening" xml:space="preserve">
+    <value>Отключить функцию массового открытия паков</value>
+  </data>
 </root>

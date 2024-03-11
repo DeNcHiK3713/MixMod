@@ -403,6 +403,15 @@ namespace MixMod.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Disable Mass Pack Opening feature.
+        /// </summary>
+        internal static string Others_DisableMassPackOpening {
+            get {
+                return ResourceManager.GetString("Others.DisableMassPackOpening", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Unfold the cards in your opponent&apos;s hand in spectator mode.
         /// </summary>
         internal static string Others_MoveEnemyCards {

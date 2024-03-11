@@ -240,4 +240,7 @@
   <data name="Shortcuts.TestShortcut" xml:space="preserve">
     <value>测试键</value>
   </data>
+  <data name="Others.DisableMassPackOpening" xml:space="preserve">
+    <value>禁用批量包打开功能</value>
+  </data>
 </root>

@@ -240,4 +240,7 @@
   <data name="Shortcuts.TestShortcut" xml:space="preserve">
     <value>Test key</value>
   </data>
+  <data name="Others.DisableMassPackOpening" xml:space="preserve">
+    <value>Disable Mass Pack Opening feature</value>
+  </data>
 </root>

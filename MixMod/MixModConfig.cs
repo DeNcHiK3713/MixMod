@@ -43,6 +43,7 @@ namespace MixMod
         internal ConfigEntry<CardState> signatureEntry;
         internal ConfigEntry<bool> showOpponentRankInGameEntry;
         internal ConfigEntry<bool> moveEnemyCardsEntry;
+        internal ConfigEntry<bool> disableMassPackOpeningEntry;
         internal ConfigEntry<int> packIdToBuyEntry;
         internal ConfigEntry<DevicePreset> devicePresetEntry;
         internal ConfigEntry<OSCategory> osEntry;
@@ -120,6 +121,7 @@ namespace MixMod
             signatureEntry = config.Bind("Gameplay", "SIGNATURE", CardState.Default, MixModLocalization.Gameplay_SIGNATURE);
             showOpponentRankInGameEntry = config.Bind("Gameplay", "ShowOpponentRankInGame", false, MixModLocalization.Gameplay_ShowOpponentRankInGame);
             moveEnemyCardsEntry = config.Bind("Others", "MoveEnemyCards", false, MixModLocalization.Others_MoveEnemyCards);
+            disableMassPackOpeningEntry = config.Bind("Others", "DisableMassPackOpening", false, MixModLocalization.Others_DisableMassPackOpening);
             //packIdToBuyEntry = config.Bind("Others", "PackIdToBuy", 0, MixModLocalization.Others_PackIdToBuy);
             devicePresetEntry = config.Bind("Gifts", "DevicePreset", DevicePreset.Default, MixModLocalization.Gifts_DevicePreset);
 #if DEBUG
@@ -259,6 +261,7 @@ namespace MixMod
         public CardState SIGNATURE { get => signatureEntry.Value; set => signatureEntry.Value = value; }
         public bool ShowOpponentRankInGame { get => showOpponentRankInGameEntry.Value; set => showOpponentRankInGameEntry.Value = value; }
         public bool MoveEnemyCards { get => moveEnemyCardsEntry.Value; set => moveEnemyCardsEntry.Value = value; }
+        public bool DisableMassPackOpening { get => disableMassPackOpeningEntry.Value; set => disableMassPackOpeningEntry.Value = value; }
         public int PackIdToBuy { get => packIdToBuyEntry.Value; set => packIdToBuyEntry.Value = value; }
         public DevicePreset DevicePreset { get => devicePresetEntry.Value; set => devicePresetEntry.Value = value; }
         public OSCategory Os { get => osEntry.Value; set => osEntry.Value = value; }
