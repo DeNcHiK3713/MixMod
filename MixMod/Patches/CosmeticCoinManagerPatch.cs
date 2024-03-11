@@ -11,8 +11,8 @@ using System.Threading.Tasks;
 
 namespace MixMod.Patches
 {
-    [HarmonyPatch(typeof(CoinManager), "InitCoinDataWhenReady", MethodType.Enumerator)]
-    public static class CoinManager_InitCoinDataWhenReady
+    [HarmonyPatch(typeof(CosmeticCoinManager), "InitCoinDataWhenReady", MethodType.Enumerator)]
+    public static class CosmeticCoinManager_InitCoinDataWhenReady
     {
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
@@ -55,14 +55,14 @@ namespace MixMod.Patches
     }
 
     [HarmonyPatch]
-    public static class CoinManager_ShowCoinPreviewDelegate
+    public static class CosmeticCoinManager_ShowCoinPreviewDelegate
     {
         public static MethodBase TargetMethod()
         {
-            var method = typeof(CoinManager).GetMethod(nameof(CoinManager.ShowCoinPreview), BindingFlags.Instance | BindingFlags.Public);
+            var method = typeof(CosmeticCoinManager).GetMethod(nameof(CosmeticCoinManager.ShowCoinPreview), BindingFlags.Instance | BindingFlags.Public);
             var instructions = method.ToDefinition().Body.Instructions;
             var targetMethod = instructions.Last(x => x.OpCode == Mono.Cecil.Cil.OpCodes.Ldftn).Operand as MethodDefinition;
-            var methodInfo = typeof(CoinManager).Module.ResolveMethod(targetMethod.MetadataToken.ToInt32());
+            var methodInfo = typeof(CosmeticCoinManager).Module.ResolveMethod(targetMethod.MetadataToken.ToInt32());
             return methodInfo;
         }
 
