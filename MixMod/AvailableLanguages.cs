@@ -10,6 +10,8 @@ namespace MixMod
         [Description("English")]
         enUS,
         [Description("Русский")]
-        ruRU
+        ruRU,
+        [Description("中文(简体)")]
+        zhCN
     }
 }

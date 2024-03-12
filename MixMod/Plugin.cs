@@ -5,7 +5,9 @@ using HarmonyLib;
 using Hearthstone.Commerce;
 using MixMod.Patches;
 using MixMod.Properties;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
@@ -17,6 +19,14 @@ namespace MixMod
     {
         private void Awake()
         {
+            // Manually load all resource files as they are not loaded by default for an unknown reason.
+            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"BepInEx\plugins\");
+            var files = Directory.GetFiles(path, @"MixMod.resources.dll", SearchOption.AllDirectories);
+            foreach (var file in files)
+            {
+                _ = Assembly.LoadFile(file);
+            }
+
             MixModConfig.Load(Config);
             MixModConfig.Get().timeScaleEnabledEntry.SettingChanged += (_, _) => TimeScaleMgr.Get().Update();
             MixModConfig.Get().devicePresetEntry.SettingChanged += (_, _) =>
