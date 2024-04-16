@@ -41,7 +41,7 @@ namespace MixMod.Patches
             {
                 return null;
             }
-            int opponentPlayerId = m_currentlyMousedOverTile.m_playerHeroEntity.GetTag(GAME_TAG.PLAYER_ID);
+            int opponentPlayerId = m_currentlyMousedOverTile.Entity.GetTag(GAME_TAG.PLAYER_ID);
             if (!GameState.Get().GetPlayerInfoMap().ContainsKey(opponentPlayerId))
             {
                 return null;
