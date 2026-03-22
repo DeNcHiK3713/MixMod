@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net46</TargetFramework>
+    <TargetFramework>net481</TargetFramework>
     <AssemblyName>MixMod</AssemblyName>
     <Description>MixMod</Description>
     <Version>1.0.39</Version>
@@ -27,22 +27,22 @@
   
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\downloads\Hearthstone_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\Downloads\Hearthstone_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\..\downloads\Hearthstone_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>..\..\Downloads\Hearthstone_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
     <Reference Include="blizzard.bgsclient">
-      <HintPath>..\..\downloads\Hearthstone_Data\Managed\blizzard.bgsclient.dll</HintPath>
+      <HintPath>..\..\Downloads\Hearthstone_Data\Managed\blizzard.bgsclient.dll</HintPath>
     </Reference>
     <Reference Include="Blizzard.T5.Configuration">
-      <HintPath>..\..\downloads\Hearthstone_Data\Managed\Blizzard.T5.Configuration.dll</HintPath>
+      <HintPath>..\..\Downloads\Hearthstone_Data\Managed\Blizzard.T5.Configuration.dll</HintPath>
     </Reference>
     <Reference Include="Blizzard.T5.Core">
-      <HintPath>..\..\downloads\Hearthstone_Data\Managed\Blizzard.T5.Core.dll</HintPath>
+      <HintPath>..\..\Downloads\Hearthstone_Data\Managed\Blizzard.T5.Core.dll</HintPath>
     </Reference>
     <Reference Include="Blizzard.T5.Localization">
-      <HintPath>..\..\downloads\Hearthstone_Data\Managed\Blizzard.T5.Localization.dll</HintPath>
+      <HintPath>..\..\Downloads\Hearthstone_Data\Managed\Blizzard.T5.Localization.dll</HintPath>
     </Reference>
   </ItemGroup>
   

@@ -2,6 +2,11 @@ name: MixMod workflow
 
 on:
   workflow_dispatch:
+    inputs:
+      override_version:
+        description: 'Override release tag version'
+        type: string
+        required: false
 
 jobs:
   build:
@@ -10,32 +15,55 @@ jobs:
       contents: write
     steps:
       - name: Clone repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+        uses: actions/checkout@v6
+
       - name: Get next version
-        uses: reecetech/version-increment@2023.3.1
+        if: ${{ !github.event.inputs.override_version }}
+        uses: reecetech/version-increment@2024.10.1
         id: version
         with:
           scheme: semver
           increment: patch
+
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: 10.0.x
+
       - name: Install dependencies
-        uses: awalsh128/cache-apt-pkgs-action@latest
+        uses: awalsh128/cache-apt-pkgs-action@v1.6.0
         with:
           packages: libimage-exiftool-perl
           version: 1.0
-      - name: Download files
+
+      - name: Make Downloads dir
         run: |
-          repo_dir=$(pwd)
-          mkdir ../downloads/
-          cd ../downloads/
-          wget https://github.com/DeNcHiK3713/CASCExplorer/releases/download/$(jq -r 'map(select(.prerelease)) | first | .tag_name' <<< $(curl --silent https://api.github.com/repos/DeNcHiK3713/CASCExplorer/releases))/CASCConsole.net6.0.linux-x64.zip -O CASCConsole.zip
+          mkdir -p ../Downloads
+          echo "Downloads_Dir=$(realpath ../Downloads/)" >> $GITHUB_ENV
+
+      - name: Get CASCConsole latest release info
+        run: |
+          curl --silent https://api.github.com/repos/DeNcHiK3713/CASCExplorer/releases >> ${{ runner.temp }}/CASCConsole_release_info.json
+          echo "CASCConsole_asset_id=$(jq -r 'map(select(.prerelease)) | first | .assets[] | select(.name | contains("linux-x64")) | .id' ${{ runner.temp }}/CASCConsole_release_info.json)" >> $GITHUB_ENV
+
+      - name: Cache CASCConsole
+        id: CASCConsole-cache
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.Downloads_Dir }}/CASCConsole
+          key: CASCConsole-${{ runner.os }}-${{ env.CASCConsole_asset_id }}
+
+      - name: Download CASCConsole
+        if: steps.CASCConsole-cache.outputs.cache-hit != 'true'
+        working-directory: ${{ env.Downloads_Dir }}
+        run: |
+          wget $(jq -r 'map(select(.prerelease)) | first | .assets[] | select(.name | contains("linux-x64")) | .browser_download_url' ${{ runner.temp }}/CASCConsole_release_info.json) -O CASCConsole.zip
           unzip CASCConsole.zip -d CASCConsole
           chmod +x ./CASCConsole/CASCConsole
+
+      - name: Download files
+        working-directory: ${{ env.Downloads_Dir }}
+        run: |
           ./CASCConsole/CASCConsole -m Pattern -e Hearthstone_Data/Managed/Assembly-CSharp.dll -o -p hsb -l None -d ./
           ./CASCConsole/CASCConsole -m Pattern -e Hearthstone_Data/Managed/Assembly-CSharp-firstpass.dll -o -p hsb -l None -d ./
           ./CASCConsole/CASCConsole -m Pattern -e Hearthstone_Data/Managed/blizzard.bgsclient.dll -o -p hsb -l None -d ./
@@ -44,65 +72,35 @@ jobs:
           ./CASCConsole/CASCConsole -m Pattern -e Hearthstone_Data/Managed/Blizzard.T5.Localization.dll -o -p hsb -l None -d ./
           ./CASCConsole/CASCConsole -m Pattern -e Hearthstone.exe -o -p hsb -l None -d ./
           UnityVersion=$(exiftool -ProductVersion -b Hearthstone.exe)
-          echo "unity_version=${UnityVersion%%f1*}" >> $GITHUB_ENV
-          cd $repo_dir
+          echo "unity_version=${UnityVersion%%f*}" >> $GITHUB_ENV
+
       - name: Edit csproj file
         run: |
-          sed -i "s/<Version>.*<\/Version>/<Version>${{ steps.version.outputs.version }}<\/Version>/" ./MixMod/MixMod.csproj
+          sed -i "s/<Version>.*<\/Version>/<Version>${{ github.event.inputs.override_version || steps.version.outputs.version }}<\/Version>/" ./MixMod/MixMod.csproj
           sed -i "s/<PackageReference Include=\"UnityEngine.Modules\" Version=\".*\" IncludeAssets=\"compile\" \/>/<PackageReference Include=\"UnityEngine.Modules\" Version=\"${{ env.unity_version }}\" IncludeAssets=\"compile\" \/>/" ./MixMod/MixMod.csproj
+
       - name: Commit changes
         id: git_auto_commit
-        uses: stefanzweifel/git-auto-commit-action@v4
-      - name: Restore dependencies
+        uses: stefanzweifel/git-auto-commit-action@v7
+
+      - name: Install dependencies
         run: dotnet restore
+
       - name: Build
-        run: dotnet build --no-restore -c Release
+        run: dotnet build -c Release --no-restore
+
+      - name: Make Release dir
+        run: mkdir -p ${{ runner.temp }}/Release
+
       - name: Make packages
+        working-directory: ${{ runner.temp }}/Release
         run: |
-          repo_dir=$(pwd)
-          mkdir ../Release/
-          cd ../Release/
-          BepInExRelease=$(curl --silent https://api.github.com/repos/BepInEx/BepInEx/releases/latest)
-          wget $(jq -r '.assets[] | select(.name | startswith("BepInEx_x86")) | .browser_download_url' <<< ${BepInExRelease}) -O BepInEx_x86.zip
-          unzip BepInEx_x86.zip -x changelog.txt -d MixMod_Windows
-          wget $(jq -r '.assets[] | select(.name | startswith("BepInEx_unix")) | .browser_download_url' <<< ${BepInExRelease}) -O BepInEx_unix.zip
-          unzip BepInEx_unix.zip -x changelog.txt -d MixMod_Mac
-          wget "https://unity.bepinex.dev/corlibs/${{ env.unity_version }}.zip" -O corlibs.zip
-          unzip corlibs.zip -d MixMod_Windows/BepInEx/unstripped_corlib/
-          unzip corlibs.zip -d MixMod_Mac/BepInEx/unstripped_corlib/
-          wget "https://unity.bepinex.dev/libraries/${{ env.unity_version }}.zip" -O libraries.zip
-          unzip libraries.zip -d MixMod_Windows/BepInEx/unstripped_corlib/
-          unzip libraries.zip -d MixMod_Mac/BepInEx/unstripped_corlib/
-          sed -i "s/dllSearchPathOverride=/dllSearchPathOverride=BepInEx\\\unstripped_corlib/" ./MixMod_Windows/doorstop_config.ini
-          sed -i "s/DOORSTOP_CORLIB_OVERRIDE_PATH=\"\"/DOORSTOP_CORLIB_OVERRIDE_PATH=\"\$BASEDIR\/BepInEx\/unstripped_corlib\"/" ./MixMod_Mac/run_bepinex.sh
-          sed -i "s/executable_name=\"\"/executable_name=\"Hearthstone.app\"/" ./MixMod_Mac/run_bepinex.sh
-          sudo tee -a ./MixMod_Mac/client.config <<EOF
-          [Config]
-          Version = 3
-          [Aurora]
-          VerifyWebCredentials = "token"
-          ClientCheck = 0
-          Env.Override = 1
-          Env = eu.actual.battle.net
-          EOF
-          mkdir ./MixMod_Windows/BepInEx/plugins/
-          cp -r ${repo_dir}/MixMod/bin/Release/net46/MixMod.dll $(ls -d ${repo_dir}/MixMod/bin/Release/net46/*/) ./MixMod_Windows/BepInEx/plugins/
-          mkdir ./MixMod_Mac/BepInEx/plugins/
-          cp -r ${repo_dir}/MixMod/bin/Release/net46/MixMod.dll $(ls -d ${repo_dir}/MixMod/bin/Release/net46/*/) ./MixMod_Mac/BepInEx/plugins/
-          wget $(jq -r '.assets | first | .browser_download_url' <<< $(curl --silent https://api.github.com/repos/BepInEx/BepInEx.ConfigurationManager/releases/latest)) -O BepInEx.ConfigurationManager.zip
-          unzip BepInEx.ConfigurationManager.zip -d MixMod_Windows/
-          unzip BepInEx.ConfigurationManager.zip -d MixMod_Mac/
-          wget https://github.com/sinai-dev/BepInExConfigManager/releases/latest/download/BepInExConfigManager.Mono.zip -O BepInExConfigManager.Mono.zip
-          unzip BepInExConfigManager.Mono.zip -d MixMod_Windows/BepInEx/
-          unzip BepInExConfigManager.Mono.zip -d MixMod_Mac/BepInEx/
-          cd MixMod_Windows/BepInEx
-          zip -9 -r ../../MixMod_${{ steps.version.outputs.version }}.zip ./plugins/MixMod.dll $(ls -d ./plugins/*/)
-          cd ..
-          zip -9 -r ../MixMod_${{ steps.version.outputs.version }}_Full_Windows.zip ./*
-          cd ../MixMod_Mac/
-          zip -9 -r ../MixMod_${{ steps.version.outputs.version }}_Full_Mac.zip ./*
+          mkdir -p plugins
+          cp -r ${{ github.workspace }}/MixMod/bin/Release/net481/MixMod.dll $(ls -d ${{ github.workspace }}/MixMod/bin/Release/net481/*/) ./plugins/
+          zip -9 -r MixMod_${{ github.event.inputs.override_version || steps.version.outputs.version }}.zip ./plugins/MixMod.dll $(ls -d ./plugins/*/)
+
       - uses: "ncipollo/release-action@v1"
         with:
-          tag: "${{ steps.version.outputs.v-version }}"
+          tag: "v${{ github.event.inputs.override_version || steps.version.outputs.version }}"
           name: "MixMod"
-          artifacts: "../Release/MixMod_*.zip"
+          artifacts: "${{ runner.temp }}/Release/MixMod_*.zip"
