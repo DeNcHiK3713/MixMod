@@ -1,5 +1,8 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
+using BepInEx.Logging;
+using HarmonyLib;
+using Hearthstone.Progression;
 using MixMod.Properties;
 using System;
 using System.Collections.Generic;
@@ -16,10 +19,11 @@ namespace MixMod
     public class MixModConfig
     {
         private static MixModConfig _mixModConfig;
-        private static PropertyInfo orphanedEntriesInfo = typeof(ConfigFile).GetProperty("OrphanedEntries", BindingFlags.NonPublic | BindingFlags.Instance);
-        private static FieldInfo configDescriptionDescriptionInfo = typeof(ConfigDescription).GetField("<Description>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance);
-        private static PropertyInfo descriptionAttributeDescriptionValueInfo = typeof(DescriptionAttribute).GetProperty("DescriptionValue", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static readonly PropertyInfo orphanedEntriesInfo = typeof(ConfigFile).GetProperty("OrphanedEntries", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static readonly FieldInfo configDescriptionDescriptionInfo = typeof(ConfigDescription).GetField("<Description>k__BackingField", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static readonly PropertyInfo descriptionAttributeDescriptionValueInfo = typeof(DescriptionAttribute).GetProperty("DescriptionValue", BindingFlags.NonPublic | BindingFlags.Instance);
         private readonly ConfigFile _config;
+        private readonly ManualLogSource _logger;
 
         internal ConfigEntry<bool> devEnabledEntry;
         internal ConfigEntry<bool> isInternalEntry;
@@ -72,9 +76,37 @@ namespace MixMod
         internal ConfigEntry<KeyboardShortcut> simulateDisconnectShortcutEntry;
         internal ConfigEntry<KeyboardShortcut> buyPackShortcutEntry;
 
-        public MixModConfig(ConfigFile config)
+        private void SetHandlerAndPatch<T>(Harmony harmony, ConfigEntry<T> configEntry, bool patch)
+        {
+            configEntry.SettingChanged += (_, _) => SwitchPatch(harmony, configEntry.Definition, patch);
+            SwitchPatch(harmony, configEntry.Definition, patch, false);
+        }
+
+        private void SwitchPatch(Harmony harmony, ConfigDefinition configDefinition, bool patch, bool unpatch = true)
+        {
+            var category = $"{configDefinition.Section}_{configDefinition.Key}";
+            try
+            {
+                if (patch)
+                {
+                    harmony.PatchCategory(category);
+                }
+                else if (unpatch)
+                {
+                    harmony.UnpatchCategory(category);
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"SwitchPatch: {category}");
+                _logger.LogError(e);
+            }
+        }
+
+        public MixModConfig(ConfigFile config, ManualLogSource logger)
         {
             _config = config;
+            _logger = logger;
             languageEntry = config.Bind("Global", "Language", AvailableLanguages.Default, MixModLocalization.Global_Language);
             ReloadLocalization();
 #if DEBUG
@@ -157,9 +189,138 @@ namespace MixMod
             //buyPackShortcutEntry = config.Bind("Shortcuts", "BuyPack", new KeyboardShortcut(KeyCode.B, KeyCode.LeftControl));
         }
 
-        public static void Load(ConfigFile config)
+        private void PatchAll(Harmony harmony)
         {
-            _mixModConfig = new MixModConfig(config);
+            try
+            {
+                harmony.PatchCategory("Default");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError("PatchCategory(\"Default\")");
+                _logger.LogError(e);
+            }
+            if (isInternalEntry is not null)
+            {
+                SetHandlerAndPatch(harmony, isInternalEntry, DevEnabled && IsInternal);
+                devEnabledEntry?.SettingChanged += (_, _) =>
+                {
+                    try
+                    {
+                        if (DevEnabled && IsInternal)
+                        {
+                            harmony.PatchCategory("Dev_IsInternal");
+                        }
+                        else
+                        {
+                            harmony.UnpatchCategory("Dev_IsInternal");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError("PatchCategory(\"Dev_IsInternal\")");
+                        _logger.LogError(e);
+                    }
+                };
+            }
+            if (boardEntry is not null)
+            {
+                SetHandlerAndPatch(harmony, boardEntry, DevEnabled && Board > 0);
+                try
+                {
+                    devEnabledEntry?.SettingChanged += (_, _) =>
+                    {
+                        if (DevEnabled && Board > 0)
+                        {
+                            harmony.PatchCategory("Dev_Board");
+                        }
+                        else
+                        {
+                            harmony.UnpatchCategory("Dev_Board");
+                        }
+                    };
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError("PatchCategory(\"Dev_Board\")");
+                    _logger.LogError(e);
+                }
+            }
+            if (goldenCoinEntry is not null)
+            {
+                SetHandlerAndPatch(harmony, goldenCoinEntry, DevEnabled && GoldenCoin != CardState.Default);
+                try
+                {
+                    devEnabledEntry?.SettingChanged += (_, _) =>
+                    {
+                        if (DevEnabled && GoldenCoin != CardState.Default)
+                        {
+                            harmony.PatchCategory("Dev_GoldenCoin");
+                        }
+                        else
+                        {
+                            harmony.UnpatchCategory("Dev_GoldenCoin");
+                        }
+                    };
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError("PatchCategory(\"Dev_GoldenCoin\")");
+                    _logger.LogError(e);
+                }
+            }
+            SetHandlerAndPatch(harmony, timeScaleEnabledEntry, TimeScaleEnabled);
+            SetHandlerAndPatch(harmony, timeScaleInGameOnlyEntry, TimeScaleInGameOnly);
+            SetHandlerAndPatch(harmony, skipHeroIntroEntry, SkipHeroIntro);
+            SetHandlerAndPatch(harmony, shutUpBobEntry, ShutUpBob);
+            SetHandlerAndPatch(harmony, extendedBMEntry, ExtendedBM);
+            SetHandlerAndPatch(harmony, disableRandomForEmotesEntry, DisableRandomForEmotes);
+            SetHandlerAndPatch(harmony, emoteSpamBlockerEntry, EmoteSpamBlocker);
+            SetHandlerAndPatch(harmony, disableThinkEmotesEntry, DisableThinkEmotes);
+            EventHandler tagPremiumHandler = (_, _) =>
+            {
+                try
+                {
+                    if (GOLDEN != CardState.Default || DIAMOND != CardState.Default || SIGNATURE != CardState.Default)
+                    {
+                        harmony.PatchCategory("TAG_PREMIUM");
+                    }
+                    else
+                    {
+                        harmony.UnpatchCategory("TAG_PREMIUM");
+                    }
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError("PatchCategory(\"TAG_PREMIUM\")");
+                    _logger.LogError(e);
+                }
+            };
+            goldenEntry.SettingChanged += tagPremiumHandler;
+            diamondEntry.SettingChanged += tagPremiumHandler;
+            signatureEntry.SettingChanged += tagPremiumHandler;
+            if (GOLDEN != CardState.Default || DIAMOND != CardState.Default || SIGNATURE != CardState.Default)
+            {
+                try
+                {
+                    harmony.PatchCategory("TAG_PREMIUM");
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError("PatchCategory(\"TAG_PREMIUM\")");
+                    _logger.LogError(e);
+                }
+            }
+            SetHandlerAndPatch(harmony, showOpponentRankInGameEntry, ShowOpponentRankInGame);
+            SetHandlerAndPatch(harmony, moveEnemyCardsEntry, MoveEnemyCards);
+            SetHandlerAndPatch(harmony, disableMassPackOpeningEntry, DisableMassPackOpening);
+            SetHandlerAndPatch(harmony, devicePresetEntry, DevicePreset != DevicePreset.Default);
+        }
+
+        public static void Load(ConfigFile config, Harmony harmony, ManualLogSource logger)
+        {
+            _mixModConfig = new MixModConfig(config, logger);
+            _mixModConfig.PatchAll(harmony);
         }
 
         public void ReloadLocalization()

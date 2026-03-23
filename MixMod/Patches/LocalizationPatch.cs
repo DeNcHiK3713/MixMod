@@ -3,6 +3,7 @@ using MixMod.Properties;
 
 namespace MixMod.Patches
 {
+    [HarmonyPatchCategory("Default")]
     [HarmonyPatch(typeof(Localization), "SetPegLocaleName")]
     public static class Localization_SetPegLocaleName
     {

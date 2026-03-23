@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace MixMod.Patches
 {
+    [HarmonyPatchCategory("Dev_GoldenCoin")]
     [HarmonyPatch(typeof(CosmeticCoinManager), "InitCoinDataWhenReady", MethodType.Enumerator)]
     public static class CosmeticCoinManager_InitCoinDataWhenReady
     {
@@ -54,6 +55,7 @@ namespace MixMod.Patches
         }
     }
 
+    [HarmonyPatchCategory("Dev_GoldenCoin")]
     [HarmonyPatch]
     public static class CosmeticCoinManager_ShowCoinPreviewDelegate
     {

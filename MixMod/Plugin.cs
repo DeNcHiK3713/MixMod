@@ -27,7 +27,9 @@ namespace MixMod
                 _ = Assembly.LoadFile(file);
             }
 
-            MixModConfig.Load(Config);
+            var harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
+
+            MixModConfig.Load(Config, harmony, Logger);
             MixModConfig.Get().timeScaleEnabledEntry.SettingChanged += (_, _) => TimeScaleMgr.Get().Update();
             MixModConfig.Get().devicePresetEntry.SettingChanged += (_, _) =>
             {
@@ -77,7 +79,6 @@ namespace MixMod
             MixModConfig.Get().timeScaleEntry.SettingChanged += (_, _) => TimeScaleMgr.Get().Update();
             MixModConfig.Get().timeScaleInGameOnlyEntry.SettingChanged += (_, _) => TimeScaleMgr.Get().Update();
             MixModConfig.Get().languageEntry.SettingChanged += (_, _) => MixModConfig.Get().ReloadLocalization();
-            var harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
             TimeScaleMgr.Get().Update();
             Logger.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded! (Patched {harmony.GetPatchedMethods().Count()} methods)");
         }

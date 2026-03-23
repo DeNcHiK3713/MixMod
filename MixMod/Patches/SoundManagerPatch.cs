@@ -8,7 +8,7 @@ namespace MixMod.Patches
     public static class SoundManagerPatch
     {
         public static bool MuteKeyPressed = false;
-        private static MethodInfo updateAppMuteInfo = typeof(SoundManager).GetMethod("UpdateAppMute", BindingFlags.Instance | BindingFlags.NonPublic);
+        private static readonly MethodInfo updateAppMuteInfo = typeof(SoundManager).GetMethod("UpdateAppMute", BindingFlags.Instance | BindingFlags.NonPublic);
         public static void OnMuteKeyPressed()
         {
             MuteKeyPressed = !MuteKeyPressed;
@@ -20,6 +20,7 @@ namespace MixMod.Patches
         }
     }
 
+    [HarmonyPatchCategory("Default")]
     [HarmonyPatch(typeof(SoundManager), "UpdateAllMutes")]
     public static class SoundManager_UpdateAllMutes
     {

@@ -3,6 +3,8 @@ using UnityEngine;
 
 namespace MixMod.Patches
 {
+
+    [HarmonyPatchCategory("Gameplay_EmoteSpamBlocker")]
     [HarmonyPatch(typeof(RemoteActionHandler), "CanReceiveEnemyEmote")]
     public static class RemoteActionHandlerPatch
     {
@@ -10,10 +12,10 @@ namespace MixMod.Patches
         private static float m_lastEnemyEmoteTime;
         private static int m_chainedEnemyEmotes;
 
-        public static void Postfix(bool __result, EmoteType emoteType, int playerId)
+        public static void Postfix(bool __result, int playerId)
         {
             int EmotesBeforeBlock;
-            if (__result && MixModConfig.Get().EmoteSpamBlocker && (EmotesBeforeBlock = MixModConfig.Get().EmotesBeforeBlock) > 0)
+            if (__result && (EmotesBeforeBlock = MixModConfig.Get().EmotesBeforeBlock) > 0)
             {
                 float currentTime = Time.time;
                 if (m_lastPlayerId == playerId)

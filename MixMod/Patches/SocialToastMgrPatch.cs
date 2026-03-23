@@ -10,12 +10,13 @@ using UnityEngine;
 
 namespace MixMod.Patches
 {
-    [HarmonyPatch(typeof(SocialToastMgr), "AddToast", new[] { typeof(UserAttentionBlocker), typeof(string), typeof(SocialToastMgr.TOAST_TYPE), typeof(float), typeof(bool) })]
+    [HarmonyPatchCategory("Global_TimeScaleEnabled")]
+    [HarmonyPatch(typeof(SocialToastMgr), "AddToast", [typeof(UserAttentionBlocker), typeof(string), typeof(SocialToastMgr.TOAST_TYPE), typeof(float), typeof(bool)])]
     public static class SocialToastMgr_AddToast
     {
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
-            List<CodeInstruction> newInstructions = new List<CodeInstruction>(instructions);
+            var newInstructions = new List<CodeInstruction>(instructions);
             int index = newInstructions.FindIndex(x => x.opcode == OpCodes.Ret);
             if (index > 0)
             {

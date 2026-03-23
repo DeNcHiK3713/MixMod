@@ -10,10 +10,11 @@ using UnityEngine;
 
 namespace MixMod.Patches
 {
+    [HarmonyPatchCategory("Gifts_DevicePreset")]
     [HarmonyPatch(typeof(Network), "GetPlatformBuilder")]
     public static class Network_GetPlatformBuilder
     {
-        public static void Postfix(Network __instance, ref Platform __result)
+        public static void Postfix(ref Platform __result)
         {
             OSCategory os;
             ScreenCategory screen;
@@ -68,7 +69,7 @@ namespace MixMod.Patches
         private static string GetMD5(string message)
         {
             byte[] hash = MD5.Create().ComputeHash(Encoding.Default.GetBytes(message));
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             for (int i = 0; i < hash.Length; i++)
             {
                 sb.Append(hash[i].ToString("x2"));
@@ -78,21 +79,13 @@ namespace MixMod.Patches
 
         private static string GetUniqueDeviceID(OSCategory os, ScreenCategory screen, string deviceName/*, string operatingSystem*/)
         {
-            switch (os)
+            return os switch
             {
-                case OSCategory.PC:
-                    //return Crypto.SHA1.Calc(Encoding.Default.GetBytes($"MixModeD{SystemInfo.deviceUniqueIdentifier}{os}{screen}{deviceName}{operatingSystem}"));
-                    return Crypto.SHA1.Calc(Encoding.Default.GetBytes($"MixModeD{SystemInfo.deviceUniqueIdentifier}{os}{screen}{deviceName}"));
-                case OSCategory.Mac:
-                case OSCategory.iOS:
-                    //return new Guid(GetMD5($"MixModeD{SystemInfo.deviceUniqueIdentifier}{os}{screen}{deviceName}{operatingSystem}")).ToString().ToUpper();
-                    return new Guid(GetMD5($"MixModeD{SystemInfo.deviceUniqueIdentifier}{os}{screen}{deviceName}")).ToString().ToUpper();
-                case OSCategory.Android:
-                    //return GetMD5($"MixModeD_{SystemInfo.deviceUniqueIdentifier}{os}{screen}{deviceName}{operatingSystem}");
-                    return GetMD5($"MixModeD_{SystemInfo.deviceUniqueIdentifier}{os}{screen}{deviceName}");
-                default:
-                    return "n/a";
-            }
+                OSCategory.PC => Crypto.SHA1.Calc(Encoding.Default.GetBytes($"MixModeD{SystemInfo.deviceUniqueIdentifier}{os}{screen}{deviceName}")),//return Crypto.SHA1.Calc(Encoding.Default.GetBytes($"MixModeD{SystemInfo.deviceUniqueIdentifier}{os}{screen}{deviceName}{operatingSystem}"));
+                OSCategory.Mac or OSCategory.iOS => new Guid(GetMD5($"MixModeD{SystemInfo.deviceUniqueIdentifier}{os}{screen}{deviceName}")).ToString().ToUpper(),//return new Guid(GetMD5($"MixModeD{SystemInfo.deviceUniqueIdentifier}{os}{screen}{deviceName}{operatingSystem}")).ToString().ToUpper();
+                OSCategory.Android => GetMD5($"MixModeD_{SystemInfo.deviceUniqueIdentifier}{os}{screen}{deviceName}"),//return GetMD5($"MixModeD_{SystemInfo.deviceUniqueIdentifier}{os}{screen}{deviceName}{operatingSystem}");
+                _ => "n/a",
+            };
         }
     }
 }

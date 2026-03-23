@@ -2,6 +2,7 @@
 
 namespace MixMod.Patches
 {
+    [HarmonyPatchCategory("TAG_PREMIUM")]
     [HarmonyPatch(typeof(Entity), nameof(Entity.LoadCard))]
     public static class Entity_LoadCard
     {        
@@ -12,6 +13,7 @@ namespace MixMod.Patches
         }
     }
 
+    [HarmonyPatchCategory("TAG_PREMIUM")]
     [HarmonyPatch(typeof(Entity), nameof(Entity.GetPremiumType))]
     public static class Entity_GetPremiumType
     {

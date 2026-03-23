@@ -9,8 +9,8 @@ namespace MixMod.Patches
 {
     public static class EmoteHandlerPatch
     {
-        private static FieldInfo m_totalEmotesInfo = typeof(EmoteHandler).GetField("m_totalEmotes", BindingFlags.Instance | BindingFlags.NonPublic);
-        private static FieldInfo m_availableEmotesInfo = typeof(EmoteHandler).GetField("m_availableEmotes", BindingFlags.Instance | BindingFlags.NonPublic);
+        private static readonly FieldInfo m_totalEmotesInfo = typeof(EmoteHandler).GetField("m_totalEmotes", BindingFlags.Instance | BindingFlags.NonPublic);
+        private static readonly FieldInfo m_availableEmotesInfo = typeof(EmoteHandler).GetField("m_availableEmotes", BindingFlags.Instance | BindingFlags.NonPublic);
         private static List<EmoteOption> m_FoundedEmotes;
 
         public static void HandleKeyboardInput(this EmoteHandler __instance, int EmoteIndex, bool useExtended = false)
@@ -32,7 +32,7 @@ namespace MixMod.Patches
                     m_FoundedEmotes[EmoteIndex].DoClick();
                     return;
                 }
-                List<EmoteOption> list = new List<EmoteOption>();
+                var list = new List<EmoteOption>();
                 foreach (EmoteOption emoteOption in m_availableEmotes.Concat(__instance.m_HiddenEmotes))
                 {
                     if (emoteOption.CanPlayerUseEmoteType(GameState.Get().GetFriendlySidePlayer()))
@@ -64,7 +64,7 @@ namespace MixMod.Patches
                     m_availableEmotes[EmoteIndex].DoClick();
                     return;
                 }
-                List<EmoteOption> list = new List<EmoteOption>();
+                var list = new List<EmoteOption>();
                 foreach (EmoteOption emoteOption in m_availableEmotes.Concat(__instance.m_HiddenEmotes))
                 {
                     if (emoteOption.CanPlayerUseEmoteType(GameState.Get().GetFriendlySidePlayer()))
@@ -84,115 +84,71 @@ namespace MixMod.Patches
             if (m_FoundedEmotes == null || m_FoundedEmotes.Count == 0)
             {
                 m_FoundedEmotes = new List<EmoteOption>(11);
-                EmoteOption emote = __instance.m_EmoteOverrides.FirstOrDefault(x => x.m_EmoteType == EmoteType.HAPPY_NEW_YEAR);
-                if (emote == null)
+                EmoteOption emote = __instance.m_EmoteOverrides.FirstOrDefault(x => x.m_EmoteType == EmoteType.HAPPY_NEW_YEAR) ?? new EmoteOption
                 {
-                    emote = new EmoteOption
-                    {
-                        m_EmoteType = EmoteType.HAPPY_NEW_YEAR,
-                        m_StringTag = "GAMEPLAY_EMOTE_LABEL_GREETINGS"
-                    };
-                }
+                    m_EmoteType = EmoteType.HAPPY_NEW_YEAR,
+                    m_StringTag = "GAMEPLAY_EMOTE_LABEL_GREETINGS"
+                };
                 m_FoundedEmotes.Add(emote);
-                emote = __instance.m_EmoteOverrides.FirstOrDefault(x => x.m_EmoteType == EmoteType.HAPPY_NEW_YEAR_LUNAR);
-                if (emote == null)
+                emote = __instance.m_EmoteOverrides.FirstOrDefault(x => x.m_EmoteType == EmoteType.HAPPY_NEW_YEAR_LUNAR) ?? new EmoteOption
                 {
-                    emote = new EmoteOption
-                    {
-                        m_EmoteType = EmoteType.HAPPY_NEW_YEAR_LUNAR,
-                        m_StringTag = "GAMEPLAY_EMOTE_LABEL_GREETINGS"
-                    };
-                }
+                    m_EmoteType = EmoteType.HAPPY_NEW_YEAR_LUNAR,
+                    m_StringTag = "GAMEPLAY_EMOTE_LABEL_GREETINGS"
+                };
                 m_FoundedEmotes.Add(emote);
-                emote = __instance.m_EmoteOverrides.FirstOrDefault(x => x.m_EmoteType == EmoteType.HAPPY_HOLIDAYS);
-                if (emote == null)
+                emote = __instance.m_EmoteOverrides.FirstOrDefault(x => x.m_EmoteType == EmoteType.HAPPY_HOLIDAYS) ?? new EmoteOption
                 {
-                    emote = new EmoteOption
-                    {
-                        m_EmoteType = EmoteType.HAPPY_HOLIDAYS,
-                        m_StringTag = "GAMEPLAY_EMOTE_LABEL_GREETINGS"
-                    };
-                }
+                    m_EmoteType = EmoteType.HAPPY_HOLIDAYS,
+                    m_StringTag = "GAMEPLAY_EMOTE_LABEL_GREETINGS"
+                };
                 m_FoundedEmotes.Add(emote);
-                emote = __instance.m_EmoteOverrides.FirstOrDefault(x => x.m_EmoteType == EmoteType.HAPPY_HALLOWEEN);
-                if (emote == null)
+                emote = __instance.m_EmoteOverrides.FirstOrDefault(x => x.m_EmoteType == EmoteType.HAPPY_HALLOWEEN) ?? new EmoteOption
                 {
-                    emote = new EmoteOption
-                    {
-                        m_EmoteType = EmoteType.HAPPY_HALLOWEEN,
-                        m_StringTag = "GAMEPLAY_EMOTE_LABEL_GREETINGS"
-                    };
-                }
+                    m_EmoteType = EmoteType.HAPPY_HALLOWEEN,
+                    m_StringTag = "GAMEPLAY_EMOTE_LABEL_GREETINGS"
+                };
                 m_FoundedEmotes.Add(emote);
-                emote = __instance.m_EmoteOverrides.FirstOrDefault(x => x.m_EmoteType == EmoteType.HAPPY_NOBLEGARDEN);
-                if (emote == null)
+                emote = __instance.m_EmoteOverrides.FirstOrDefault(x => x.m_EmoteType == EmoteType.HAPPY_NOBLEGARDEN) ?? new EmoteOption
                 {
-                    emote = new EmoteOption
-                    {
-                        m_EmoteType = EmoteType.HAPPY_NOBLEGARDEN,
-                        m_StringTag = "GAMEPLAY_EMOTE_LABEL_GREETINGS"
-                    };
-                }
+                    m_EmoteType = EmoteType.HAPPY_NOBLEGARDEN,
+                    m_StringTag = "GAMEPLAY_EMOTE_LABEL_GREETINGS"
+                };
                 m_FoundedEmotes.Add(emote);
-                emote = __instance.m_EmoteOverrides.FirstOrDefault(x => x.m_EmoteType == EmoteType.FIRE_FESTIVAL_FIREWORKS_RANK_ONE);
-                if (emote == null)
+                emote = __instance.m_EmoteOverrides.FirstOrDefault(x => x.m_EmoteType == EmoteType.FIRE_FESTIVAL_FIREWORKS_RANK_ONE) ?? new EmoteOption
                 {
-                    emote = new EmoteOption
-                    {
-                        m_EmoteType = EmoteType.FIRE_FESTIVAL_FIREWORKS_RANK_ONE,
-                        m_StringTag = "GAMEPLAY_EMOTE_LABEL_FIREWORKS"
-                    };
-                }
+                    m_EmoteType = EmoteType.FIRE_FESTIVAL_FIREWORKS_RANK_ONE,
+                    m_StringTag = "GAMEPLAY_EMOTE_LABEL_FIREWORKS"
+                };
                 m_FoundedEmotes.Add(emote);
-                emote = __instance.m_EmoteOverrides.FirstOrDefault(x => x.m_EmoteType == EmoteType.FIRE_FESTIVAL_FIREWORKS_RANK_TWO);
-                if (emote == null)
+                emote = __instance.m_EmoteOverrides.FirstOrDefault(x => x.m_EmoteType == EmoteType.FIRE_FESTIVAL_FIREWORKS_RANK_TWO) ?? new EmoteOption
                 {
-                    emote = new EmoteOption
-                    {
-                        m_EmoteType = EmoteType.FIRE_FESTIVAL_FIREWORKS_RANK_TWO,
-                        m_StringTag = "GAMEPLAY_EMOTE_LABEL_FIREWORKS"
-                    };
-                }
+                    m_EmoteType = EmoteType.FIRE_FESTIVAL_FIREWORKS_RANK_TWO,
+                    m_StringTag = "GAMEPLAY_EMOTE_LABEL_FIREWORKS"
+                };
                 m_FoundedEmotes.Add(emote);
-                emote = __instance.m_EmoteOverrides.FirstOrDefault(x => x.m_EmoteType == EmoteType.FIRE_FESTIVAL_FIREWORKS_RANK_THREE);
-                if (emote == null)
+                emote = __instance.m_EmoteOverrides.FirstOrDefault(x => x.m_EmoteType == EmoteType.FIRE_FESTIVAL_FIREWORKS_RANK_THREE) ?? new EmoteOption
                 {
-                    emote = new EmoteOption
-                    {
-                        m_EmoteType = EmoteType.FIRE_FESTIVAL_FIREWORKS_RANK_THREE,
-                        m_StringTag = "GAMEPLAY_EMOTE_LABEL_FIREWORKS"
-                    };
-                }
+                    m_EmoteType = EmoteType.FIRE_FESTIVAL_FIREWORKS_RANK_THREE,
+                    m_StringTag = "GAMEPLAY_EMOTE_LABEL_FIREWORKS"
+                };
                 m_FoundedEmotes.Add(emote);
-                emote = __instance.m_EmoteOverrides.FirstOrDefault(x => x.m_EmoteType == EmoteType.FROST_FESTIVAL_FIREWORKS_RANK_ONE);
-                if (emote == null)
+                emote = __instance.m_EmoteOverrides.FirstOrDefault(x => x.m_EmoteType == EmoteType.FROST_FESTIVAL_FIREWORKS_RANK_ONE) ?? new EmoteOption
                 {
-                    emote = new EmoteOption
-                    {
-                        m_EmoteType = EmoteType.FROST_FESTIVAL_FIREWORKS_RANK_ONE,
-                        m_StringTag = "GAMEPLAY_EMOTE_LABEL_FIREWORKS"
-                    };
-                }
+                    m_EmoteType = EmoteType.FROST_FESTIVAL_FIREWORKS_RANK_ONE,
+                    m_StringTag = "GAMEPLAY_EMOTE_LABEL_FIREWORKS"
+                };
                 m_FoundedEmotes.Add(emote);
-                emote = __instance.m_EmoteOverrides.FirstOrDefault(x => x.m_EmoteType == EmoteType.FROST_FESTIVAL_FIREWORKS_RANK_TWO);
-                if (emote == null)
+                emote = __instance.m_EmoteOverrides.FirstOrDefault(x => x.m_EmoteType == EmoteType.FROST_FESTIVAL_FIREWORKS_RANK_TWO) ?? new EmoteOption
                 {
-                    emote = new EmoteOption
-                    {
-                        m_EmoteType = EmoteType.FROST_FESTIVAL_FIREWORKS_RANK_TWO,
-                        m_StringTag = "GAMEPLAY_EMOTE_LABEL_FIREWORKS"
-                    };
-                }
+                    m_EmoteType = EmoteType.FROST_FESTIVAL_FIREWORKS_RANK_TWO,
+                    m_StringTag = "GAMEPLAY_EMOTE_LABEL_FIREWORKS"
+                };
                 m_FoundedEmotes.Add(emote);
-                emote = __instance.m_EmoteOverrides.FirstOrDefault(x => x.m_EmoteType == EmoteType.FROST_FESTIVAL_FIREWORKS_RANK_THREE);
-                if (emote == null)
+                emote = __instance.m_EmoteOverrides.FirstOrDefault(x => x.m_EmoteType == EmoteType.FROST_FESTIVAL_FIREWORKS_RANK_THREE) ?? new EmoteOption
                 {
-                    emote = new EmoteOption
-                    {
-                        m_EmoteType = EmoteType.FROST_FESTIVAL_FIREWORKS_RANK_THREE,
-                        m_StringTag = "GAMEPLAY_EMOTE_LABEL_FIREWORKS"
-                    };
-                }
+                    m_EmoteType = EmoteType.FROST_FESTIVAL_FIREWORKS_RANK_THREE,
+                    m_StringTag = "GAMEPLAY_EMOTE_LABEL_FIREWORKS"
+                };
                 m_FoundedEmotes.Add(emote);
                 foreach (EmoteOption emoteOption in m_FoundedEmotes)
                 {
@@ -211,35 +167,33 @@ namespace MixMod.Patches
         }
     }
 
+    [HarmonyPatchCategory("Gameplay_DisableRandomForEmotes")]
     [HarmonyPatch(typeof(EmoteHandler), nameof(EmoteHandler.HandleInput))]
     public static class EmoteHandler_HandleInput
     {
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
-            List<CodeInstruction> newInstructions = new List<CodeInstruction>(instructions);
-            int index = newInstructions.FindLastIndex(x => x.opcode == OpCodes.Stfld && (x.operand as FieldInfo).Name == "m_totalEmotes");
+            var newInstructions = new List<CodeInstruction>(instructions);
+            int index = newInstructions.FindLastIndex(x => x.opcode == OpCodes.Callvirt && (x.operand as MethodInfo).Name == "HasTag");
             if (index > 0)
             {
-                index++;
-                newInstructions.Insert(index++, new CodeInstruction(OpCodes.Call, ((Func<MixModConfig>)MixModConfig.Get).Method));
-                newInstructions.Insert(index++, new CodeInstruction(OpCodes.Callvirt, typeof(MixModConfig).GetProperty("DisableRandomForEmotes", BindingFlags.Public | BindingFlags.Instance).GetGetMethod()));
-                var label = generator.DefineLabel();
-                newInstructions.Insert(index, new CodeInstruction(OpCodes.Brtrue_S, label));
-                index += 6;
-                newInstructions[index].labels.Add(label);
+                newInstructions[index] = new CodeInstruction(OpCodes.Ldc_I4_0);
+                index -= 3;
+                newInstructions.RemoveRange(index, 3);
             }
             return newInstructions;
         }
     }
-    
+
+    [HarmonyPatchCategory("Global_TimeScaleEnabled")]
     [HarmonyPatch(typeof(EmoteHandler), nameof(EmoteHandler.EmoteSpamBlocked))]
-    public static class EmoteHandler_EmoteSpamBlocked
+    public static class EmoteHandler_EmoteSpamBlocked_TimeScaleEnabled
     {
-        private static FieldInfo m_timeSinceLastEmoteInfo = typeof(EmoteHandler).GetField("m_timeSinceLastEmote", BindingFlags.Instance | BindingFlags.NonPublic);
+        private static readonly FieldInfo m_timeSinceLastEmoteInfo = typeof(EmoteHandler).GetField("m_timeSinceLastEmote", BindingFlags.Instance | BindingFlags.NonPublic);
 
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
-            List<CodeInstruction> newInstructions = new List<CodeInstruction>(instructions);
+            var newInstructions = new List<CodeInstruction>(instructions);
             int index = 2;
             newInstructions[index++].opcode = OpCodes.Brtrue_S;
             newInstructions.Insert(index++, new CodeInstruction(OpCodes.Ldarg_0));
@@ -249,11 +203,28 @@ namespace MixMod.Patches
             newInstructions.Insert(index++, new CodeInstruction(OpCodes.Bge_Un_S, l1));
             newInstructions[index].MoveLabelsFrom(newInstructions[index + 2]);
             index += 2;
-            newInstructions.Insert(index, new CodeInstruction(OpCodes.Call, ((Func<MixModConfig>)MixModConfig.Get).Method));
-            newInstructions[index++].labels.Add(l1);
-            newInstructions.Insert(index++, new CodeInstruction(OpCodes.Callvirt, typeof(MixModConfig).GetProperty("ExtendedBM", BindingFlags.Public | BindingFlags.Instance).GetGetMethod()));
-            newInstructions.Insert(index, new CodeInstruction(OpCodes.Brtrue_S));
-            newInstructions[index].operand = newInstructions[index + 3].operand;
+            newInstructions[index].labels.Add(l1);
+            return newInstructions;
+        }
+    }
+
+    [HarmonyPatchCategory("Gameplay_ExtendedBM")]
+    [HarmonyPatch(typeof(EmoteHandler), nameof(EmoteHandler.EmoteSpamBlocked))]
+    public static class EmoteHandler_EmoteSpamBlocked_ExtendedBM
+    {
+        public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
+        {
+            var newInstructions = new List<CodeInstruction>(instructions);
+            int index = newInstructions.FindIndex(x => x.opcode == OpCodes.Callvirt && (x.operand as MethodInfo).Name == "IsFriendly");
+            if (index > 0)
+            {
+                index--;
+                var newInstruction = new CodeInstruction(OpCodes.Ldc_I4_0);
+                newInstructions[index].MoveLabelsTo(newInstruction);
+                newInstructions[index++] = newInstruction;
+                newInstructions[index++] = new CodeInstruction(OpCodes.Ret);
+                newInstructions.RemoveRange(index, newInstructions.Count - index);
+            }
             return newInstructions;
         }
     }

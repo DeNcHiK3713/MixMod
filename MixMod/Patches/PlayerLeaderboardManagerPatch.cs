@@ -55,12 +55,13 @@ namespace MixMod.Patches
         }
     }
 
+    [HarmonyPatchCategory("Default")]
     [HarmonyPatch(typeof(PlayerLeaderboardManager), nameof(PlayerLeaderboardManager.SetNextOpponent))]
     public static class PlayerLeaderboardManager_SetNextOpponent
     {
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
-            List<CodeInstruction> newInstructions = new List<CodeInstruction>(instructions);
+            var newInstructions = new List<CodeInstruction>(instructions);
             int index = newInstructions.FindIndex(x => x.opcode == OpCodes.Ret);
             if (index > 0)
             {
@@ -72,7 +73,8 @@ namespace MixMod.Patches
             return newInstructions;
         }
     }
-    
+
+    [HarmonyPatchCategory("Default")]
     [HarmonyPatch(typeof(PlayerLeaderboardManager), nameof(PlayerLeaderboardManager.SetCurrentOpponent))]
     public static class PlayerLeaderboardManager_SetCurrentOpponent
     {

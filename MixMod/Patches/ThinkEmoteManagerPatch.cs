@@ -6,12 +6,13 @@ using System.Text;
 
 namespace MixMod.Patches
 {
+    [HarmonyPatchCategory("Gameplay_DisableThinkEmotes")]
     [HarmonyPatch(typeof(ThinkEmoteManager), "Update")]
     public static class ThinkEmoteManagerPatch
     {
         public static bool Prefix()
         {
-            return !MixModConfig.Get().DisableThinkEmotes;
+            return false;
         }
     }
 }

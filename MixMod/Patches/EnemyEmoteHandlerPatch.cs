@@ -10,8 +10,8 @@ namespace MixMod.Patches
 {
     public static class EnemyEmoteHandlerPatch
     {
-        private static MethodInfo doSquelchClickInfo = typeof(EnemyEmoteHandler).GetMethod("DoSquelchClick", BindingFlags.Instance | BindingFlags.NonPublic);
-        private static FieldInfo m_squelchedInfo = typeof(EnemyEmoteHandler).GetField("m_squelched", BindingFlags.Instance | BindingFlags.NonPublic);
+        private static readonly MethodInfo doSquelchClickInfo = typeof(EnemyEmoteHandler).GetMethod("DoSquelchClick", BindingFlags.Instance | BindingFlags.NonPublic);
+        private static readonly FieldInfo m_squelchedInfo = typeof(EnemyEmoteHandler).GetField("m_squelched", BindingFlags.Instance | BindingFlags.NonPublic);
 
         public static void DoSquelchClick(this EnemyEmoteHandler __instance)
         {
@@ -26,32 +26,28 @@ namespace MixMod.Patches
             }
         }
     }
-    
+
+    [HarmonyPatchCategory("Gameplay_EmoteSpamBlocker")]
     [HarmonyPatch(typeof(EnemyEmoteHandler), "Awake")]
     public static class EnemyEmoteHandler_Awake
     {
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
             generator.DeclareLocal(typeof(bool));
-            List<CodeInstruction> newInstructions = new List<CodeInstruction>(instructions);
+            var newInstructions = new List<CodeInstruction>(instructions);
             int index = newInstructions.FindLastIndex(x => x.opcode == OpCodes.Stfld && (x.operand as FieldInfo).Name == "m_squelched");
             if (index > 0)
             {
                 index++;
                 newInstructions.Insert(index++, new CodeInstruction(OpCodes.Call, ((Func<MixModConfig>)MixModConfig.Get).Method));
-                newInstructions.Insert(index++, new CodeInstruction(OpCodes.Callvirt, typeof(MixModConfig).GetProperty("EmoteSpamBlocker", BindingFlags.Public | BindingFlags.Instance).GetGetMethod()));
-                Label label = generator.DefineLabel();
-                newInstructions.Insert(index++, new CodeInstruction(OpCodes.Brfalse_S, label));
-                newInstructions.Insert(index++, new CodeInstruction(OpCodes.Call, ((Func<MixModConfig>)MixModConfig.Get).Method));
                 newInstructions.Insert(index++, new CodeInstruction(OpCodes.Callvirt, typeof(MixModConfig).GetProperty("EmotesBeforeBlock", BindingFlags.Public | BindingFlags.Instance).GetGetMethod()));
                 newInstructions.Insert(index++, new CodeInstruction(OpCodes.Ldc_I4_0));
                 newInstructions.Insert(index++, new CodeInstruction(OpCodes.Ceq));
-                Label l2 = generator.DefineLabel();
-                newInstructions.Insert(index++, new CodeInstruction(OpCodes.Br_S, l2));
-                newInstructions.Insert(index, new CodeInstruction(OpCodes.Ldc_I4_0));
-                newInstructions[index++].labels.Add(label);
+                Label l1 = generator.DefineLabel();
+                newInstructions.Insert(index++, new CodeInstruction(OpCodes.Br_S, l1));
+                newInstructions.Insert(index++, new CodeInstruction(OpCodes.Ldc_I4_0));
                 newInstructions.Insert(index, new CodeInstruction(OpCodes.Stloc_1));
-                newInstructions[index].labels.Add(l2);
+                newInstructions[index].labels.Add(l1);
                 index += 9;
                 newInstructions[index].opcode = OpCodes.Ldloc_1;
             }

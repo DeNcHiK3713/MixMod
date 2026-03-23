@@ -4,6 +4,7 @@ using System.Reflection;
 
 namespace MixMod.Patches
 {
+    [HarmonyPatchCategory("Dev_GoldenCoin")]
     [HarmonyPatch]
     public static class GetPremiumPatch
     {

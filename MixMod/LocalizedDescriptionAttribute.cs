@@ -10,26 +10,20 @@ using System.Threading.Tasks;
 
 namespace MixMod
 {
-    public class LocalizedDescriptionAttribute : DescriptionAttribute
+    public class LocalizedDescriptionAttribute(Type resourceType, string name) : DescriptionAttribute(name)
     {
-        public Type ResourceType { get; }
-
-        public LocalizedDescriptionAttribute(Type resourceType, string name) : base(name)
-        {
-            ResourceType = resourceType;
-        }
+        public Type ResourceType { get; } = resourceType;
 
         public override string Description
         {
             get
             {
-                var resourceManager = ResourceType.GetProperty("ResourceManager", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null) as ResourceManager;
-                var culture = ResourceType.GetProperty("Culture", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null) as CultureInfo;
-                if (resourceManager is null)
+                if (ResourceType.GetProperty("ResourceManager", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null) is not ResourceManager resourceManager)
                 {
                     return null;
                 }
-
+                
+                var culture = ResourceType.GetProperty("Culture", BindingFlags.Static | BindingFlags.NonPublic).GetValue(null) as CultureInfo;
                 return resourceManager.GetString(base.Description, culture);
             }
         }

@@ -17,8 +17,8 @@ namespace MixMod.Patches
         {
             return m_currentOpponent;
         }
-        
-        private static void UpdateCurrentOpponent()
+
+        public static void UpdateCurrentOpponent()
         {
             if (GameState.Get() == null)
             {
@@ -33,19 +33,15 @@ namespace MixMod.Patches
             }
             m_currentOpponent = BnetPresenceMgr.Get().GetPlayer(opposingSidePlayer.GetGameAccountId());
         }
-
-        public static void OnGameCreated(GameState.CreateGamePhase phase, object userData)
-        {
-            UpdateCurrentOpponent();
-        }
     }
 
+    [HarmonyPatchCategory("Default")]
     [HarmonyPatch(typeof(Gameplay), "OnCreateGame")]
     public static class Gameplay_OnCreateGame
     {
-        public static void Postfix(GameState.CreateGamePhase phase, object userData)
+        public static void Postfix()
         {
-            GameplayPatch.OnGameCreated(phase, userData);
+            GameplayPatch.UpdateCurrentOpponent();
         }
     }
 }

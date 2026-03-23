@@ -7,20 +7,21 @@ namespace MixMod.Patches
 {
     public static class TimeScaleMgrPatch
     {
-        private static MethodInfo updateInfo = typeof(TimeScaleMgr).GetMethod("Update", BindingFlags.Instance | BindingFlags.NonPublic);
+        private static readonly MethodInfo updateInfo = typeof(TimeScaleMgr).GetMethod("Update", BindingFlags.Instance | BindingFlags.NonPublic);
         
         public static void Update(this TimeScaleMgr __instance)
         {
             updateInfo?.Invoke(__instance, null);
         }
     }
-    
+
+    [HarmonyPatchCategory("Global_TimeScaleEnabled")]
     [HarmonyPatch(typeof(TimeScaleMgr), "Update")]
     public static class TimeScaleMgr_Update
     {
         public static bool Prefix(float ___m_timeScaleMultiplier, float ___m_gameTimeScale)
         {
-            if (!MixModConfig.Get().TimeScaleEnabled || (MixModConfig.Get().TimeScaleInGameOnly && !GameMgrPatch.GameStarted))
+            if (MixModConfig.Get().TimeScaleInGameOnly && !GameMgrPatch.GameStarted)
             {
                 return true;
             }

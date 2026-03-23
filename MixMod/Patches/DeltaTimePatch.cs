@@ -6,6 +6,7 @@ using UnityEngine;
 
 namespace MixMod.Patches
 {
+    [HarmonyPatchCategory("Global_TimeScaleEnabled")]
     [HarmonyPatch]
     public static class UpdatePatch
     {
@@ -17,7 +18,7 @@ namespace MixMod.Patches
         
         public static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
-            List<CodeInstruction> newInstructions = new List<CodeInstruction>(instructions);
+            var newInstructions = new List<CodeInstruction>(instructions);
             var deltaTimeInfo = typeof(Time).GetProperty("deltaTime", BindingFlags.Static | BindingFlags.Public).GetGetMethod();
             var unscaledDeltaTimeInfo = typeof(Time).GetProperty("unscaledDeltaTime", BindingFlags.Static | BindingFlags.Public).GetGetMethod();
 

@@ -2,6 +2,7 @@
 
 namespace MixMod.Patches
 {
+    [HarmonyPatchCategory("TAG_PREMIUM")]
     [HarmonyPatch(typeof(Actor), nameof(Actor.GetPremium))]
     public static class Actor_GetPremium
     {

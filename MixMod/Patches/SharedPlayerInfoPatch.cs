@@ -10,7 +10,7 @@ namespace MixMod.Patches
 {
     public static class SharedPlayerInfoPatch
     {
-        private static FieldInfo m_gameAccountIdInfo = typeof(SharedPlayerInfo).GetField("m_gameAccountId", BindingFlags.NonPublic | BindingFlags.Instance);
+        private static readonly FieldInfo m_gameAccountIdInfo = typeof(SharedPlayerInfo).GetField("m_gameAccountId", BindingFlags.NonPublic | BindingFlags.Instance);
         
         public static BnetGameAccountId GetGameAccountId(this SharedPlayerInfo __instance)
         {

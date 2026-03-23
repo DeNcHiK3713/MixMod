@@ -3,6 +3,7 @@ using HarmonyLib;
 
 namespace MixMod.Patches
 {
+    [HarmonyPatchCategory("Dev_Board")]
     [HarmonyPatch(typeof(GameMgr), "ChangeBoardIfNecessary")]
     public static class GameMgr_ChangeBoardIfNecessary
     {
@@ -23,19 +24,18 @@ namespace MixMod.Patches
         public static bool GameStarted { get; set; }
     }
 
+    [HarmonyPatchCategory("Global_TimeScaleInGameOnly")]
     [HarmonyPatch(typeof(GameMgr), "OnGameSetup")]
     public static class GameMgr_OnGameSetup
     {
         public static void Postfix()
         {
             GameMgrPatch.GameStarted = true;
-            if (MixModConfig.Get().TimeScaleInGameOnly)
-            {
-                TimeScaleMgr.Get().Update();
-            }
+            TimeScaleMgr.Get().Update();
         }
     }
 
+    [HarmonyPatchCategory("Global_TimeScaleInGameOnly")]
     [HarmonyPatch(typeof(GameMgr), "OnGameCanceled")]
     [HarmonyPatch(typeof(GameMgr), "OnGameEnded")]
     public static class GameMgr_OnGameEnded
@@ -43,10 +43,7 @@ namespace MixMod.Patches
         public static void Postfix()
         {
             GameMgrPatch.GameStarted = false;
-            if (MixModConfig.Get().TimeScaleInGameOnly)
-            {
-                TimeScaleMgr.Get().Update();
-            }
+            TimeScaleMgr.Get().Update();
         }
     }
 }
