@@ -85,7 +85,7 @@ namespace MixMod
 
         private void Update()
         {
-            if (!MixModConfig.Get().EnableShortcuts || !Input.anyKey)
+            if (!MixModConfig.Get().EnableShortcuts || !Input.anyKey || (UniversalInputManager.Get()?.IsTextInputActive() ?? false))
             {
                 return;
             }
