@@ -102,5 +102,5 @@ jobs:
       - uses: "ncipollo/release-action@v1"
         with:
           tag: "v${{ github.event.inputs.override_version || steps.version.outputs.version }}"
-          name: "MixMod"
+          name: "MixMod v${{ github.event.inputs.override_version || steps.version.outputs.version }}"
           artifacts: "${{ runner.temp }}/Release/MixMod_*.zip"
