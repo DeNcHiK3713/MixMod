@@ -3,6 +3,7 @@ using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
 using Hearthstone.Progression;
+using MixMod.Patches;
 using MixMod.Properties;
 using System;
 using System.Collections.Generic;
@@ -289,6 +290,8 @@ namespace MixMod
                     {
                         harmony.UnpatchCategory("TAG_PREMIUM");
                     }
+
+                    EntityPatch.UpdateAllEntities();
                 }
                 catch (Exception e)
                 {

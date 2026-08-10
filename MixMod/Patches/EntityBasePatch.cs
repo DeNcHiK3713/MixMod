@@ -2,6 +2,7 @@
 
 namespace MixMod.Patches
 {
+    [HarmonyPatchCategory("TAG_PREMIUM")]
     [HarmonyPatch(typeof(EntityBase), nameof(EntityBase.GetPremiumType))]
     public static class EntityBase_GetPremiumType
     {
