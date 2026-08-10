@@ -39,22 +39,28 @@ namespace MixMod.Patches
                 return;
             }
 
+            System.Collections.Generic.List<Network.Entity.Tag> tags = [];
+            System.Collections.Generic.List<Network.Entity.TagList> tagLists = [];
+            System.Collections.Generic.List<Network.Entity.Tag> defTags = [];
+
+            var cardData = new Entity.LoadCardData
+            {
+                updateActor = true,
+                restartStateSpells = true,
+                fromChangeEntity = true
+            };
+
             foreach (var entity in entityMap.Values)
             {
                 var netEntity = new Network.Entity
                 {
-                    Tags = [],
-                    TagLists = [],
+                    Tags = tags,
+                    TagLists = tagLists,
                     CardID = entity.GetCardId(),
-                    DefTags = [],
+                    DefTags = defTags,
                 };
 
-                entity.HandleEntityChange(netEntity, new Entity.LoadCardData
-                {
-                    updateActor = true,
-                    restartStateSpells = true,
-                    fromChangeEntity = true
-                }, false);
+                entity.HandleEntityChange(netEntity, cardData, false);
             }
         }
     }
